@@ -102,3 +102,10 @@ dist
 
 # TernJS port file
 .tern-port
+
+### react ###
+.DS_*
+**/*.backup.*
+**/*.back.*
+
+node_modules
