@@ -24,9 +24,10 @@ class App extends Component{
       <div className="App">
         <React.Fragment>
           <Router>
-            <NavbarHeader />
+            
             <Routes>
-              <Route exact path="/" element={<HomePage />} />*
+              <Route exact path="/" element={<LandingPage />} />*
+              <Route path="/home" element={<HomePage />} />*
               <Route path="/login" element={<LoginPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/profile" element={<ProfilePage />} />
