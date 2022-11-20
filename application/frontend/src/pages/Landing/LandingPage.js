@@ -28,11 +28,11 @@ const LandingPage = () => {
               <Form className="mx-4 fw-bold mt-4">
                 <Form.Group className="mb-3" controlId="formFirst">
                   <Form.Label>First Name</Form.Label>
-                  <Form.Control type="name" placeholder="John"/>
+                  <Form.Control type="name" placeholder="Walter"/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formLast">
                   <Form.Label>Last Name</Form.Label>
-                  <Form.Control type="name" placeholder="Doe"/>
+                  <Form.Control type="name" placeholder="White"/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formCompany">
                   <Form.Label>Company Name</Form.Label>
