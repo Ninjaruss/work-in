@@ -6,6 +6,7 @@
     "client-install": "cd client && npm install",
     "start": "node ./bin/www",
     "server": "nodemon ./bin/www",
+    "build": "cd ../frontend && npm install && npm run build",
     "client": "cd ../frontend && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\" "
   },
