@@ -15,7 +15,32 @@ const LandingPage = () => {
               <Card.Img className="" height="300" src="https://media.istockphoto.com/id/1134102363/vector/business-people-working-together-in-a-coworking-space.jpg?s=612x612&w=0&k=20&c=dF_cdzMmUZ5gYjBIEtu47qrmnCf0MfBlg38QTJf4CO4=" alt="Card image" />
               <Card.Body>
                 <h1 class="display-5 fw-bold text-start">Scheduling made easy.</h1>
-                <h1 class="display-5 fw-bold my-4 text-start">Set up a work schedule for your company seamlessly.</h1>
+                <h1 class="display-5 fw-bold my-4 text-start">Set up a work schedule for your business seamlessly.</h1>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col className="my-4" sm={5}>
+            <Card bg="info" className="my-2 shadow-lg">
+              <h1 class="fw-bold">Sign Up</h1>
+              <p>
+                Try out Work-in with your business today!
+              </p>
+              
+              <></>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+
+      {/*
+      <Container className="mx-auto my-2 px-4 py-2 shadow-lg">
+        <Row className="mx-auto justify-content-md-center">
+          <Col className="my-auto">
+            <Card border="light">
+              <Card.Img className="" height="300" src="https://media.istockphoto.com/id/1134102363/vector/business-people-working-together-in-a-coworking-space.jpg?s=612x612&w=0&k=20&c=dF_cdzMmUZ5gYjBIEtu47qrmnCf0MfBlg38QTJf4CO4=" alt="Card image" />
+              <Card.Body>
+                <h1 class="display-5 fw-bold text-start">Scheduling made easy.</h1>
+                <h1 class="display-5 fw-bold my-4 text-start">Set up a work schedule for your business seamlessly.</h1>
               </Card.Body>
             </Card>
           </Col>
@@ -51,6 +76,7 @@ const LandingPage = () => {
           </Col>
         </Row>
       </Container>
+      */}
 
       <hr class="border-2 border-top border-dark"></hr>
 

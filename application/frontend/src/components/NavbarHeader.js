@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const NavbarHeader = () => {
   return (
-    <Navbar expand="lg" bg="light" variant="light" sticky="top" className="shadow-sm">
+    <Navbar expand="lg" bg="light" variant="light" sticky="top" className="shadow-lg">
       <Container>
         <Navbar.Brand href="/" className="ps-5">
           <h3>
@@ -33,6 +33,7 @@ const NavbarHeader = () => {
             </Nav>
           </Col>
 
+          {/*
           <Nav.Item className="ml-auto pe-4">
             <Nav.Link>
               <Link to="/login">
@@ -42,6 +43,7 @@ const NavbarHeader = () => {
               </Link>
             </Nav.Link>
           </Nav.Item>
+          */}
         </Navbar.Collapse> 
       </Container> 
     </Navbar>
