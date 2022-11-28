@@ -28,8 +28,14 @@ app.get('*', (req, res) => {
 })
 */
 
+/*
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+*/
+
+app.get("/", (req, res) => {
+  res.json({ message: "Hello from server!" });
 });
 
 // catch 404 and forward to error handler
