@@ -34,6 +34,8 @@ app.get('/', function (req, res) {
 });
 */
 
+app.use(express.static(path.resolve(__dirname, '../frontend/build')));
+
 app.get("/", (req, res) => {
   res.json({ message: "Hello from server!" });
 });
