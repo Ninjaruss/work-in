@@ -18,10 +18,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.resolve(__dirname, '../frontend/build')));
 
 app.use('/api', indexRouter);
 app.use('/api/users', usersRouter);
+
+app.use(
+  express.static(path.join(__dirname, "../frontend/build"))
+)
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
+});
 
 /*
 app.get('*', (req, res) => {
@@ -31,12 +38,9 @@ app.get('*', (req, res) => {
 
 /*
 app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 */
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
- });
 
 
 
