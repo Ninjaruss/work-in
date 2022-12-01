@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "client-install": "cd client && yarn install",
+    "client-install": "cd frontend && yarn install",
     "start": "yarn ./bin/www",
     "server": "nodemon ./bin/www",
     "build": "cd ../frontend && yarn install && yarn run build",
