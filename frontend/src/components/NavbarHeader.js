@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const NavbarHeader = () => {
   return (
-    <Navbar expand="lg" bg="light" variant="light" sticky="top" className="shadow-lg">
+    <Navbar expand="lg" bg="light" variant="light" sticky="top" className="shadow-sm">
       <Container>
         <Navbar.Brand href="/" className="ps-5">
           <h3>
@@ -20,15 +20,15 @@ const NavbarHeader = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Col>
-            <Nav className="d-flex justify-content-center">
+            <Nav className="d-flex">
               <Nav.Item>
-                <Nav.Link href="#point1">Features</Nav.Link>
+                <Nav.Link href="#about"><Button variant="light">About</Button></Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href="#point2">First</Nav.Link>
+                <Nav.Link href="#features"><Button variant="light">Features</Button></Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href="#point3">Second</Nav.Link>
+                <Nav.Link href="#updates"><Button variant="light">Updates</Button></Nav.Link>
               </Nav.Item>
             </Nav>
           </Col>
