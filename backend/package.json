@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "client-install": "cd client && npm install",
-    "start": "node ./bin/www",
+    "client-install": "cd client && yarn install",
+    "start": "yarn ./bin/www",
     "server": "nodemon ./bin/www",
-    "build": "cd ../frontend && npm install && npm run build",
-    "client": "cd ../frontend && npm start",
-    "dev": "concurrently \"npm run server\" \"npm run client\" "
+    "build": "cd ../frontend && yarn install && yarn run build",
+    "client": "cd ../frontend && yarn start",
+    "dev": "concurrently \"yarn run server\" \"yarn run client\" "
   },
   "dependencies": {
     "concurrently": "^7.5.0",
