@@ -74,21 +74,6 @@ const loginUser = asyncHandler(async (req, res) => {
 // @access Private
 const getMe = asyncHandler(async (req, res) => {
     res.status(200).json(req.user)
-  })
-
-// @desc Get user
-// @route GET /api/users
-// @access Private
-const getUser = asyncHandler(async (req, res) => {
-    const users = await User.find()
-    res.status(200).json(users)
-})
-
-// @desc Delete user
-// @route DELETE /api/users
-// @access Private
-const deleteUser = asyncHandler(async (req, res) => {
-    res.status(200).json({message: `Delete user ${req.params.uid}`})
 })
 
 // Generate JWT
@@ -99,5 +84,5 @@ const generateToken = (id) => {
 }
 
 module.exports = {
-    registerUser, loginUser, getMe, getUser, deleteUser
+    registerUser, loginUser, getMe
 }
