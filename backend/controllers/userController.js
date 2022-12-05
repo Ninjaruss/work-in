@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400)
     throw new Error('Invalid user data')
   }
-  })
+})
 
 // @desc Authenticate a user
 // @route POST /api/users/login
