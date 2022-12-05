@@ -9,13 +9,13 @@ import NavbarHeader from './components/NavbarHeader';
 import NavbarFooter from './components/NavbarFooter';
 
 // Pages
-import LandingPage from './pages/Landing/LandingPage';
-import HomePage from './pages/Home/HomePage';
-import LoginPage from './pages/LoginPage';
-import UndefinedPage from './pages/UndefinedPage';
-import CalendarPage from './pages/Calendar/CalendarPage';
-import TimecardPage from './pages/Timecard/TimecardPage';
-import ProfilePage from './pages/Profile/ProfilePage';
+import LandingPage from './components/Landing/LandingPage';
+import HomePage from './components/Home/HomePage';
+import LoginPage from './components/Auth/LoginPage';
+import UndefinedPage from './components/UndefinedPage';
+import CalendarPage from './components/Calendar/CalendarPage';
+import TimecardPage from './components/Timecard/TimecardPage';
+import ProfilePage from './components/Profile/ProfilePage';
 
 class App extends Component{
   render()
@@ -24,7 +24,6 @@ class App extends Component{
       <div className="App">
         <React.Fragment>
           <Router>
-            
             <Routes>
               <Route exact path="/" element={<LandingPage />} />*
               <Route path="/home" element={<HomePage />} />*
