@@ -1,17 +1,16 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const path = require('path');
 
 const colors = require('colors');
 const connectDB = require('./db/conn');
-var dotenv = require('dotenv').config()
+const dotenv = require('dotenv').config()
 
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
 const errorHandler = require('./middleware/errorHandler');
 
 connectDB();
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,7 +21,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(errorHandler)
 
 // routers
 var indexRouter = require('./routes/indexRouter');
@@ -41,9 +39,12 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+app.use(function (req, res, next) {
+  console.log('Time:', Date.now())
+  next()
+})
+
+// error handling
+app.use(errorHandler)
 
 module.exports = app;
