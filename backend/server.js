@@ -8,13 +8,10 @@ const dotenv = require('dotenv').config()
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const errorHandler = require('./middleware/errorHandler');
+const createError = require("http-errors");
 
 connectDB();
 const app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 
 // middleware
 app.use(logger('dev'));
@@ -38,6 +35,9 @@ app.get("/", (req, res) => {
 // error handling
 app.use(errorHandler)
 
-
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  next(createError(404));
+});
 
 module.exports = app;
