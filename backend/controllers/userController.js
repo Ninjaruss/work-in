@@ -4,21 +4,33 @@ const asyncHandler = require('express-async-handler')
 
 const User = require('../models/userModel')
 
+/*
+ TODO: Check if user exists already 
+ (duplicates: can have 1 user using email and 1 using phone pointing to same person)
+*/
 // @desc Register new user
 // @route POST /api/users/register
 // @access Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { first_name, last_name, email, password } = req.body
+  const { first_name, last_name, email, phone, password } = req.body
 
-  if (!first_name || !last_name || !email || !password) {
+  // require first/last name and password
+  if (!first_name || !last_name || !password) {
     res.status(400)
     throw new Error('Please add all fields')
   }
 
-  // Check if user exists
-  const userExists = await User.findOne({ email })
+  // require either email or phone
+  if (!email && !phone) {
+    res.status(400)
+    throw new Error('Please add either email or phone')
+  }
 
-  if (userExists) {
+  // Check if user exists through either email or phone
+  const userExists_email = await User.findOne({ email })
+  const userExists_phone = await User.findOne({ phone })
+
+  if (userExists_email || userExists_phone) {
     res.status(400)
     throw new Error('User already exists')
   }
@@ -32,6 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
     first_name,
     last_name,
     email,
+    phone,
     password: hashedPassword,
   })
 
@@ -41,6 +54,7 @@ const registerUser = asyncHandler(async (req, res) => {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
+      phone: user.phone,
       token: generateToken(user._id),
     })
   } else {
@@ -49,14 +63,21 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 })
 
-// @desc Authenticate a user
+// @desc Authenticate a user using phone/email as login w/ password
 // @route POST /api/users/login
 // @access Public
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body
+  const { email, phone, password } = req.body
+  let user
 
-  // Check for user email
-  const user = await User.findOne({ email })
+  if (email) {
+    user = await User.findOne({ email })
+  } else if (phone){
+    user = await User.findOne({ phone })
+  } else {
+    res.status(400)
+    throw new Error('User could not be found')
+  }
 
   if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
@@ -64,6 +85,7 @@ const loginUser = asyncHandler(async (req, res) => {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
+      phone: user.phone,
       token: generateToken(user._id),
       })
   } else {

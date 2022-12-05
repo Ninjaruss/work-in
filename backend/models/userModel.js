@@ -10,19 +10,40 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a last name'],
     },
+    password: {
+      type: String,
+      required: [true, 'Please add a password'],
+    },
+
+    // either/or used for login => unique 
     email: {
       type: String,
       required: [false, 'Please add an email'],
       unique: true,
     },
-    password: {
+    phone: {
       type: String,
-      required: [true, 'Please add a password'],
+      required: [false, 'Please add a phone number'],
+      unique: true,
     },
+    
     organization: {
       type: mongoose.Schema.Types.ObjectId,
       required: false,
       ref: 'Organization'
+    },
+    calendar: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      ref: 'Calendar'
+    },
+    role: {
+      type: String,
+      required: false
+    },
+    permission: {
+      type: String,
+      required: false
     }
   },
   {
