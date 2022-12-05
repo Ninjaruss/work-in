@@ -39,11 +39,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
-app.use(function (req, res, next) {
-  console.log('Time:', Date.now())
-  next()
-})
-
 // error handling
 app.use(errorHandler)
 
