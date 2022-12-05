@@ -22,13 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// routers
-var indexRouter = require('./routes/indexRouter');
-var usersRouter = require('./routes/usersRouter');
-
 // routes
-app.use('/api', indexRouter);
-app.use('/api/users', usersRouter);
+app.use('/api', require('./routes/indexRouter'));
+app.use('/api/users',  require('./routes/userRouter'));
 
 // serve frontend build at root directory uri
 app.use(
@@ -41,5 +37,7 @@ app.get("/", (req, res) => {
 
 // error handling
 app.use(errorHandler)
+
+
 
 module.exports = app;
