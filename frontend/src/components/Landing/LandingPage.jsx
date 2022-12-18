@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, Form, Container, Row, Col, Card, ListGroup, Image, Ratio} from "react-bootstrap";
 
-import NavbarHeader from '../../components/NavbarHeader';
+import NavbarHeader from '../NavbarHeader';
 
 const LandingPage = () => {
   return (

@@ -1,8 +1,22 @@
 import React from "react";
 import {Nav, Navbar, Button, Container, NavDropdown, Col} from "react-bootstrap";
-import { Link } from 'react-router-dom';
 
-const NavbarHeader = () => {
+import { FaSignInAlt, FaSignOutAlt, FaUser } from 'react-icons/fa'
+import { Link, useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { logout, reset } from '../features/auth/authSlice'
+
+function NavbarHeader() {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
+
+  const onLogout = () => {
+    dispatch(logout())
+    dispatch(reset())
+    navigate('/')
+  }
+
   return (
     <Navbar expand="lg" bg="light" variant="light" sticky="top" className="shadow-sm">
       <Container>
@@ -32,18 +46,31 @@ const NavbarHeader = () => {
               </Nav.Item>
             </Nav>
           </Col>
-
-          {/*
-          <Nav.Item className="ml-auto pe-4">
-            <Nav.Link>
-              <Link to="/login">
-                <Button variant="info" size="lg">
-                  Sign In
-                </Button>
-              </Link>
-            </Nav.Link>
-          </Nav.Item>
-          */}
+          
+          <ul>
+            {user ? (
+              <li>
+                <button className='btn' onClick={onLogout}>
+                  <FaSignOutAlt /> Logout
+                </button>
+              </li>
+            ) : (
+              <>
+                <li>
+                  <Link to='/login'>
+                    <FaSignInAlt /> Login
+                  </Link>
+                </li>
+                <li>
+                  <Link to='/register'>
+                    <FaUser /> Register
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
+          
+          
         </Navbar.Collapse> 
       </Container> 
     </Navbar>

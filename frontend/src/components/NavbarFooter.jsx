@@ -5,12 +5,11 @@ const NavbarFooter = () => {
   return (
     <Container>
       <hr class="border-2 border-top border-dark"></hr>
-    
-        <Container>
-          <Row className="w-50 mx-auto">
-            <p class="text-center text-muted">© 2022 Work-in, Inc</p>
-          </Row>
-        </Container>
+      <Container>
+        <Row className="w-50 mx-auto">
+          <p class="text-center text-muted">© 2022 Work-in, Inc</p>
+        </Row>
+      </Container>
     </Container>
   )
 }
