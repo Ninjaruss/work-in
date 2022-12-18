@@ -3,6 +3,8 @@ import './App.css';
 import React, { Component} from 'react';
 import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 // Components
 import NavbarHeader from './components/NavbarHeader';
@@ -12,6 +14,7 @@ import NavbarFooter from './components/NavbarFooter';
 import LandingPage from './components/Landing/LandingPage';
 import HomePage from './components/Home/HomePage';
 import LoginPage from './components/Auth/LoginPage';
+import RegisterPage from './components/Auth/RegisterPage';
 import UndefinedPage from './components/UndefinedPage';
 import CalendarPage from './components/Calendar/CalendarPage';
 import TimecardPage from './components/Timecard/TimecardPage';
@@ -28,6 +31,7 @@ class App extends Component{
               <Route exact path="/" element={<LandingPage />} />*
               <Route path="/home" element={<HomePage />} />*
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/timecard" element={<TimecardPage />} />
@@ -35,6 +39,7 @@ class App extends Component{
             </Routes>
             <NavbarFooter />
           </Router>
+          <ToastContainer />
         </React.Fragment>
       </div>
     )
