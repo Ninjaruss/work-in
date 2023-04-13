@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { register, reset } from '../../features/auth/authSlice'
 import Spinner from '../../components/common/Spinner'
-import { Container, Button, Card, Row, Form} from "react-bootstrap";
+import { Container, Button, Card, Row, Col, Form} from "react-bootstrap";
 
 function RegisterPage() {
     const [formData, setFormData] = useState({
@@ -46,17 +46,17 @@ function RegisterPage() {
     }
 
     const onSubmit = (e) => {
-    e.preventDefault()
+        e.preventDefault()
 
-    if (password !== password2) {
-        toast.error('Passwords do not match')
-    } else {
-        const userData = {
-            first_name, last_name, email, phone, password, password2
+        if (password !== password2) {
+            toast.error('Passwords do not match')
+        } else {
+            const userData = {
+                first_name, last_name, email, phone, password, password2
+            }
+
+            dispatch(register(userData))
         }
-
-        dispatch(register(userData))
-    }
     }
 
     if (isLoading) {
@@ -82,23 +82,36 @@ function RegisterPage() {
                     <Form id="sign-in-form" className="text-center p-3 w-100" onSubmit={onSubmit}>
                         <h4 className="text-start">FIRST NAME</h4>
                         <Form.Group controlId="first_name" className="my-1">
-                            <Form.Control type="text" size="lg" placeholder="Your first name" onChange={onChange} name="first_name" value={first_name} className="position-relative" />
+                            <Form.Control type="text" size="lg" placeholder="Your first name" onChange={onChange} name="first_name" value={first_name} className="position-relative" required/>
                         </Form.Group>
                         <h4 className="text-start">LAST NAME</h4>
                         <Form.Group controlId="last_name" className="my-1">
-                            <Form.Control type="text" size="lg" placeholder="Your last name" onChange={onChange} name="last_name" value={last_name} className="position-relative" />
+                            <Form.Control type="text" size="lg" placeholder="Your last name" onChange={onChange} name="last_name" value={last_name} className="position-relative" required/>
                         </Form.Group>
-                        <h4 className="text-start">EMAIL</h4>
-                        <Form.Group controlId="email" className="my-1">
-                            <Form.Control type="email" size="lg" placeholder="Enter your email" onChange={onChange} name="email" value={email} className="position-relative" />
-                        </Form.Group>
+                        <Row>
+                            <Col>
+                                <h4 className="text-start">EMAIL</h4>
+                                <Form.Group controlId="email" className="my-1">
+                                    <Form.Control type="email" size="lg" placeholder="Enter your email" onChange={onChange} name="email" value={email} className="position-relative" />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={1}>
+                                <h4 className="d-flex justify-content-center">OR</h4>
+                            </Col>
+                            <Col>
+                                <h4 className="text-start">PHONE</h4>
+                                <Form.Group controlId="phone" className="my-1">
+                                    <Form.Control type="text" size="lg" placeholder="Enter your phone number" onChange={onChange} name="phone" value={phone} className="position-relative" />
+                                </Form.Group>
+                            </Col>
+                        </Row>
                         <h4 className="text-start">PASSWORD</h4>
                         <Form.Group controlId="password">
-                            <Form.Control type="password" size="lg" placeholder="Enter password" onChange={onChange} name="password" value={password} className="position-relative" />
+                            <Form.Control type="password" size="lg" placeholder="Enter password" onChange={onChange} name="password" value={password} className="position-relative" required/>
                         </Form.Group>
                         <h4 className="text-start">CONFIRM PASSWORD</h4>
                         <Form.Group controlId="password2">
-                            <Form.Control type="password" size="lg" placeholder="Confirm password" onChange={onChange} name="password2" value={password2} className="position-relative" />
+                            <Form.Control type="password" size="lg" placeholder="Confirm password" onChange={onChange} name="password2" value={password2} className="position-relative" required/>
                         </Form.Group>
                         <Form.Group>
                             <div className="d-grid">
@@ -107,6 +120,11 @@ function RegisterPage() {
                         </Form.Group>
                     </Form>
                 </Card.Body>
+                <Card.Footer>
+                  <div class="d-flex justify-content-center links">
+                      Already have an account?<a href="/login">Sign in</a>
+                  </div>
+              </Card.Footer>
             </Card>
         </Container>
     )

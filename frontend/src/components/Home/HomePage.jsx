@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, Form, Container, Row, Col, Card, Nav} from "react-bootstrap";
 
-const HomePage = () => {
+function HomePage() {
 
     return (
         <Container>

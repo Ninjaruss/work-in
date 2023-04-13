@@ -11,11 +11,11 @@ const CalendarPage = () => {
 
     const handleCloseDay = () => setShowDay(false);
     const handleShowDay = () => setShowDay(true);
-
+    
     return (
         <Container>
             <DayViewModal dayView={dayView} date={date} handleCloseDay={handleCloseDay} handleShowDay={handleShowDay}></DayViewModal>
-            <Container className="col-lg-8">
+            <Container className="col-lg-9">
                 <Calendar onChange={setDate} value={date} onClickDay={handleShowDay}/>
             </Container>
         </Container>

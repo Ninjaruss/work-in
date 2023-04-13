@@ -1,10 +1,9 @@
-import './App.css';
-
-import React, { Component} from 'react';
-import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import "bootstrap/dist/css/bootstrap.min.css";
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Components
 import NavbarHeader from './components/NavbarHeader';
@@ -19,31 +18,39 @@ import UndefinedPage from './components/UndefinedPage';
 import CalendarPage from './components/Calendar/CalendarPage';
 import TimecardPage from './components/Timecard/TimecardPage';
 import ProfilePage from './components/Profile/ProfilePage';
+import OnboardingPage from './components/Onboarding/OnboardingPage';
 
-class App extends Component{
-  render()
-  {
-    return (
-      <div className="App">
-        <React.Fragment>
-          <Router>
-            <Routes>
-              <Route exact path="/" element={<LandingPage />} />*
-              <Route path="/home" element={<HomePage />} />*
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/calendar" element={<CalendarPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/timecard" element={<TimecardPage />} />
-              <Route element={<UndefinedPage />} />
-            </Routes>
-            <NavbarFooter />
-          </Router>
-          <ToastContainer />
-        </React.Fragment>
-      </div>
-    )
-  }
+function App() {
+  const { user } = useSelector((state) => state.auth);
+
+  return (
+    <Router>
+      <NavbarHeader isLoggedIn={user !== null}/>
+      <ToastContainer />
+      <Routes>
+        <Route exact path="/" element={user ? <Navigate to="/home" replace /> : <LandingPage />} />
+        <Route exact path="/home" element={user ? <HomePage /> : <Navigate to="/" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        <Route
+          path="/profile"
+          element={user ? <ProfilePage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/calendar"
+          element={user ? <CalendarPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/timecard"
+          element={user ? <TimecardPage /> : <Navigate to="/" />}
+        />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/*" element={<UndefinedPage />} />
+        </Routes>
+      <NavbarFooter />
+    </Router>
+  );
 }
 
 export default App;

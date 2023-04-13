@@ -1,13 +1,9 @@
 import React from "react";
 import {Button, Form, Container, Row, Col, Card, ListGroup, Image, Ratio} from "react-bootstrap";
 
-import NavbarHeader from '../NavbarHeader';
-
 const LandingPage = () => {
   return (
     <Container>
-      <NavbarHeader />
-
       <Container className="mx-auto my-2 px-4 py-2 shadow-lg">
         <Row className="mx-auto justify-content-md-center">
           <Col className="my-auto">

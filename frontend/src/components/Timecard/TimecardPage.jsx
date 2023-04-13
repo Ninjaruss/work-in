@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import {Button, Form, Container, Row, Col, Card, Nav, ListGroup} from "react-bootstrap";
+import {Container, ListGroup} from "react-bootstrap";
 
 const hours = 37.5
 const wage = 17.50
@@ -8,18 +8,20 @@ class TimecardPage extends Component {
     constructor(){
         super();
         this.state = {
-            userTable: [],
+            user: null,
         }
     }
 
     componentDidMount() {
-        fetch("/api/users")
-          .then(res => res.json())
-          .then(userTable => this.setState({userTable}, () => console.log('UserTable fetched..'), userTable));
+        fetch("/api/users/me")
+          .then((res) => res.json())
+          .then((user) => this.setState({ user }, () => console.log("User fetched..")));
     }
 
     render()
     {
+        const { user } = this.state; // Destructure user from state
+
         return (
             <Container className="my-5">
                 <h1>Week Payout Estimate</h1>
@@ -29,10 +31,14 @@ class TimecardPage extends Component {
                     <ListGroup.Item><b>Base wage: </b>{wage}</ListGroup.Item>
                     <ListGroup.Item><b>Total Estimate: </b>{hours*wage}</ListGroup.Item>
                 </ListGroup>
-                <ul>
-                    {this.state.userTable.map(user =>
-                        <li key={user.id}>{user.username} {user.hoursWorked} {user.basePay}</li>)}
-                </ul>                
+                {user ? ( // Conditional rendering to handle cases where user is null or not yet fetched
+                    <ul>
+                        {user.first_name}
+                    </ul>
+                    ) : (
+                    <p>Loading user data...</p>
+                )}   
+                          
             </Container>
         )
     }
