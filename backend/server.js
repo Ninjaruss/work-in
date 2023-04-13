@@ -22,6 +22,7 @@ app.use(cookieParser());
 // routes
 app.use('/api', require('./routes/indexRouter'));
 app.use('/api/users',  require('./routes/userRouter'));
+app.use('/api/calendars',  require('./routes/calendarRouter'));
 
 // serve frontend build at root directory uri
 app.use(
@@ -32,12 +33,13 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
-// error handling
-app.use(errorHandler)
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
+
+// error handling
+app.use(errorHandler)
+
 
 module.exports = app;
