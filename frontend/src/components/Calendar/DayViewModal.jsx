@@ -67,6 +67,7 @@ const DayViewModal = (props) => {
     const [availableEnabled, setAvailableEnabled] = useState(false);
 
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null); // date selected from the regular React calendar (props.date)
 
     // Add new time from selected/highlighted slot button
     const [showPrompt, setShowPrompt] = useState(false);
@@ -177,10 +178,6 @@ const DayViewModal = (props) => {
     const onBeforeDeleteEvent = useCallback((res) => {
         // Replace with API call; replace parameter with res
         const { id, calendarId } = res;
-        console.log("deleteEvent:");
-        console.log(id);
-        console.table(events)
-        console.log("delete end")
 
         // Update events state
         setEvents(prevEvents => {
@@ -217,10 +214,6 @@ const DayViewModal = (props) => {
         if (changes.end && changes.end.d) {
             updatedChanges.end = new Date(changes.end.d).toISOString() ;
         }
-        console.log("Changes")
-        console.table(changes)
-        console.log("updatedChanges")
-        console.table(updatedChanges)
 
         // Update events state
         setEvents(prevEvents => {
@@ -324,6 +317,7 @@ const DayViewModal = (props) => {
             });
             cal.current.getInstance().setDate(props.date.toLocaleDateString());
             cal.current.getInstance().scrollToNow();
+            setSelectedDate(props.date.toLocaleDateString());
         }
     }, [cal, props.date]);
 
@@ -402,15 +396,16 @@ const DayViewModal = (props) => {
     */
     return (
         <Modal show={props.dayView} onHide={props.handleCloseDay} dialogClassName="dayview-modal" size="lg" centered>
-            <Modal.Header closeButton>
+            <Modal.Header closeButton className="bg-light">
+                <h2>{new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h2>
             </Modal.Header>
 
             <Modal.Body>
                 <Container>
                     <Row>
-                        <Col sm={1}>
+                        <Col sm={2} className="mt-3 text-center bg-light">
                             <h4>Filters</h4>
-                            <Form className="text-left">
+                            <Form className="text-left text-center">
                                 <Form.Check
                                     type="switch"
                                     id="personal-switch"
@@ -436,12 +431,12 @@ const DayViewModal = (props) => {
                             </Form>
 
                             <h4>Options</h4>
-                            <Button variant="info" onClick={handleSwitchView}>
+                            <Button variant="outline-dark" onClick={handleSwitchView}>
                                 Switch View
                             </Button>
                         </Col>
 
-                        <Col sm={8} className="text-left">
+                        <Col sm={7} className="text-left">
                             <TuiCalendar
                                 ref={cal}
                                 height="500px"
@@ -458,10 +453,10 @@ const DayViewModal = (props) => {
                                 onSelectDateTime={onSelectDateTime}
                             />
                         </Col>
-                        <Col sm={3}>
+                        <Col sm={3} className="bg-light">
                             <Form>
                                 <Form.Group>
-                                <Form.Label>Title</Form.Label>
+                                <Form.Label><h4>Title</h4></Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter title"
@@ -471,7 +466,7 @@ const DayViewModal = (props) => {
                                 />
                                 </Form.Group>
                                 <Form.Group>
-                                <Form.Label>Calendar</Form.Label>
+                                <Form.Label><h4>Calendar</h4></Form.Label>
                                 <Form.Control
                                     as="select"
                                     value={calendarId}
@@ -485,6 +480,7 @@ const DayViewModal = (props) => {
                                 </Form.Control>
                                 </Form.Group>
                                 <Form.Group>
+                            
                                 <Form.Check
                                     type="checkbox"
                                     label="All Day"
@@ -494,7 +490,7 @@ const DayViewModal = (props) => {
                                 />
                                 </Form.Group>
                                 <Form.Group>
-                                <Form.Label>Body</Form.Label>
+                                <Form.Label><h4>Body</h4></Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     placeholder="Enter body"
@@ -506,22 +502,25 @@ const DayViewModal = (props) => {
                             </Form>
                             <Row className="mt-3">
                                 <ButtonGroup>
-                                    {title && calendarId && body && (
+                                    {title && calendarId && body && (!selectedEvent || !selectedEvent.id) &&  (
                                     <Button variant="outline-dark" onClick={handleCreateEvent}>
                                         Add Event
                                     </Button>
                                     )}
-                                    {selectedEvent && title && calendarId && body && (
+                                    
+                                </ButtonGroup>
+                                <ButtonGroup>
+                                {selectedEvent && selectedEvent.id && title && calendarId && body && (
                                     <Button variant="outline-dark" onClick={handleUpdateEvent}>
                                         Update Event
                                     </Button>
                                     )}
-                                    {selectedEvent && title && calendarId && body && (
+                                    {selectedEvent && selectedEvent.id && title && calendarId && body && (
                                     <Button variant="outline-dark" onClick={handleDeleteEvent}>
                                         Delete Event
                                     </Button>
                                     )}
-                                </ButtonGroup>
+                                    </ButtonGroup>
                             </Row>
                         </Col>
                     </Row>
@@ -529,16 +528,7 @@ const DayViewModal = (props) => {
             </Modal.Body>
 
             <Modal.Footer>
-                <Button variant="secondary" onClick={props.handleCloseDay}>
-                    Close
-                </Button>
-                <Button variant="primary" onClick={() => {
-                    if (window.confirm("Are you sure you want to save changes?")) {
-                        props.handleCloseDay();
-                    }
-                }}>
-                    Save Changes
-                </Button>
+                
             </Modal.Footer>
         </Modal>
     ); 
