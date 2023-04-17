@@ -13,7 +13,9 @@ server {
 
     location /api {
         proxy_pass http://127.0.0.1:3001;  # Update with your backend server address
-        # Add any other proxy settings as needed
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
     }
 
     listen 443 ssl; # managed by Certbot
