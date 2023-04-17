@@ -23,11 +23,10 @@ const eventSchema = mongoose.Schema({
   end: {
     type: Date,
   },
-  /*
+
   isAllDay: {
     type: Boolean,
   },
-  */
 });
 
 const calendarSchema = mongoose.Schema(
