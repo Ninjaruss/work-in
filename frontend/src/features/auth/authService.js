@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = '/api/users/'
+const API_URL = process.env.NODE_ENV === 'development' ? '/api/calendars/' : 'https://ninjaruss.net/api/calendars/'; // Update with your actual production UR
 
 // Register user
 const register = async (userData) => {
