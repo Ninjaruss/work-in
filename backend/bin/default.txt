@@ -1,0 +1,37 @@
+Example for Nginx config /etc/nginx/sites-available/default
+
+server {
+    server_name work-in.net www.work-in.net;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;  # Update with your React frontend server address
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /api {
+        proxy_pass http://127.0.0.1:3001;  # Update with your backend server address
+        # Add any other proxy settings as needed
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/work-in.net/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/work-in.net/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+server {
+    if ($host = www.work-in.net) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    if ($host = work-in.net) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+    server_name work-in.net www.work-in.net;
+    return 404; # managed by Certbot
+}
