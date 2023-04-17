@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/calendars/'; // Your backend API URL
+const API_URL = process.env.NODE_ENV === 'development' ? '/api/calendars/' : 'https://ninjaruss.net/api/calendars/'; // Update with your actual production UR
 
 // Set the authentication token in the request headers
 axios.interceptors.request.use(
