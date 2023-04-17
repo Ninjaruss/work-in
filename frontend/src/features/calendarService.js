@@ -5,16 +5,19 @@ const API_URL = process.env.NODE_ENV === 'development' ? '/api/calendars/' : 'ht
 // Set the authentication token in the request headers
 axios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Replace with your own method of getting the authentication token
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers['Access-Control-Allow-Origin'] = '*'; // Add this line to enable CORS
+    config.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE'; // Add the allowed methods for CORS
     return config;
   },
   (error) => {
     return Promise.reject(error);
   }
 );
+
 
 // Create a new calendar
 export const createCalendar = async (calendarData) => {
