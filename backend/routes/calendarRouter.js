@@ -1,13 +1,31 @@
-var express = require('express');
-var router = express.Router();
-const { newCalendar, getCalendar, deleteCalendar, updateCalendar, getCalendarByUserId } = require('../controllers/calendarController')
+const express = require('express');
+const router = express.Router();
+const calendarController = require('../controllers/calendarController');
+
 const { protect } = require('../middleware/authToken')
 
-router.post('/:id', newCalendar)
-router.get('/:id', getCalendar)
-router.put('/:id', updateCalendar)
-router.delete('/:id', deleteCalendar)
-router.get('/user/:userId', getCalendarByUserId )
+// Create a new calendar
+router.post('/', calendarController.newCalendar);
 
+// Get a calendar by ID
+router.get('/:id', calendarController.getCalendar);
+
+// Update a calendar by ID
+router.put('/:id', calendarController.updateCalendar);
+
+// Delete a calendar by ID
+router.delete('/:id', calendarController.deleteCalendar);
+
+// Get a calendar by user ID
+router.get('/user/:userId', calendarController.getCalendarByUserId);
+
+// Update a calendar by user ID
+router.put('/user/:userId', calendarController.updateCalendarByUserId);
+
+// Update a calendar by organization ID
+router.put('/organization/:organizationId', calendarController.updateCalendarByOrganizationId);
+
+// Delete a calendar by user ID
+router.delete('/user/:userId', calendarController.deleteCalendarByUserId);
 
 module.exports = router;

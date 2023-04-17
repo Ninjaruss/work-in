@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Provider } from 'react-redux'; // Import the Provider component from react-redux
+import store from './app/store'; // Import your Redux store
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -53,4 +55,11 @@ function App() {
   );
 }
 
-export default App;
+// Wrap your App component with the Provider component and pass in the Redux store
+const AppWithRedux = () => (
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+
+export default AppWithRedux;

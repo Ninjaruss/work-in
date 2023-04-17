@@ -5,7 +5,7 @@
   "scripts": {
     "client-install": "cd ../frontend && yarn install",
     "start": "node ./bin/www",
-    "devStart": "nodemon ./bin/www",
+    "devStart": "nodemon --inspect ./bin/www",
     "build": "cd ../frontend && yarn install && yarn run build",
     "client": "cd ../frontend && yarn start",
     "dev": "concurrently \"yarn run server\" \"yarn run client\" "
@@ -21,6 +21,7 @@
     "express-async-handler": "^1.2.0",
     "http-errors": "^2.0.0",
     "jade": "~1.11.0",
+    "joi": "^17.9.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.7.5",
     "morgan": "~1.9.1",

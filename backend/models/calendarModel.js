@@ -1,35 +1,33 @@
 const mongoose = require('mongoose');
 
 const eventSchema = mongoose.Schema({
-  title: {
+  id: {
     type: String,
-    required: true
+    unique: true
   },
-  body: {
+  calendarId: {
     type: String,
-    required: true
-  },
-  start: {
-    type: Date,
-    required: true
-  },
-  end: {
-    type: Date,
-    required: true
-  },
-  isAllDay: {
-    type: Boolean,
-    default: false
   },
   category: {
     type: String,
-    default: 'time'
   },
-  calendarId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'Calendar'
-  }
+  title: {
+    type: String,
+  },
+  body: {
+    type: String,
+  },
+  start: {
+    type: Date,
+  },
+  end: {
+    type: Date,
+  },
+  /*
+  isAllDay: {
+    type: Boolean,
+  },
+  */
 });
 
 const calendarSchema = mongoose.Schema(
@@ -41,7 +39,7 @@ const calendarSchema = mongoose.Schema(
     },
     organizationId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: false,
       ref: 'Organization'
     },
     events: [eventSchema]

@@ -6,12 +6,18 @@ import { Button, Nav, Navbar } from 'react-bootstrap';
 
 const NavbarHeader = () => {
   const user = useSelector(state => state.auth.user);
+  const isLoading = useSelector(state => state.auth.isLoading); // Added: Get isLoading state
   const dispatch = useDispatch();
   const location = useLocation();
 
   const handleLogout = () => {
     dispatch(logout());
   };
+
+  if (isLoading) {
+    // You can return a loading spinner or null, or any other default behavior here
+    return null;
+  }
 
   return (
     <Navbar expand="lg" bg="light" variant="light" sticky="top" className="shadow-sm">
@@ -46,7 +52,7 @@ const NavbarHeader = () => {
             </Nav.Item>
           </Nav>
         )}
-        <Nav className="ml-auto">
+        <Nav className="ml-auto align-items-center">
           {user !== null ? (
             <>
               <Nav.Item>
@@ -58,7 +64,10 @@ const NavbarHeader = () => {
                   }}
                   className="nav-link"
                 >
-                  <Button variant="outline-dark">Logout</Button>
+                  <div className="d-flex align-items-center">
+                    <span className="me-2">{`${user.first_name} ${user.last_name}`}</span>
+                    <Button variant="outline-dark">Logout</Button>
+                  </div>
                 </Nav.Link>
               </Nav.Item>
             </>
