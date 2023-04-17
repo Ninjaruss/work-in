@@ -24,7 +24,7 @@ var server = http.createServer(app);
 
 // Enable CORS
 var cors = require('cors');
-app.use(cors);
+app.use(cors());
 
 /**
  * Listen on provided port, on all network interfaces.
