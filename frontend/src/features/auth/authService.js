@@ -22,6 +22,9 @@ const register = async (userData) => {
       localStorage.setItem('user', JSON.stringify(response.data));
     }
 
+    console.log("--register response--")
+    console.table(response)
+
     return response.data;
   } catch (error) {
     throw new Error('Failed to register user');
@@ -36,6 +39,9 @@ const login = async (userData) => {
     if (response.data) {
       localStorage.setItem('user', JSON.stringify(response.data));
     }
+
+    console.log("--login response--")
+    console.table(response)
 
     return response.data;
   } catch (error) {
