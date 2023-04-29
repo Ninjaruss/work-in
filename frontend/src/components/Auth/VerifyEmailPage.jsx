@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation  } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { reset, verifyEmail } from '../../features/auth/authSlice';
 import Spinner from '../../components/common/Spinner';
