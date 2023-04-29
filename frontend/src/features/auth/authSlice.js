@@ -112,6 +112,8 @@ export const authSlice = createSlice({
     setEmailVerificationStatus: (state, action) => {
       // Update the email verification status in the Redux store
       state.verified = action.payload;
+      // Save verified status to localStorage
+      localStorage.setItem('verified', action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -123,6 +125,7 @@ export const authSlice = createSlice({
         state.isLoading = false
         state.isSuccess = true
         state.user = action.payload
+        state.verified = false; // Reset verified state after registration
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false
@@ -152,6 +155,8 @@ export const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null
+        state.verified = false; // Reset verified state after logout
+        localStorage.removeItem('verified'); // Remove verified status from localStorage
       })
       .addCase(verifyEmail.pending, (state) => {
         state.isLoading = true;
@@ -171,6 +176,13 @@ export const authSlice = createSlice({
       });
   },
 })
+
+// Get verified status from localStorage
+const verified = JSON.parse(localStorage.getItem('verified'));
+// Update initial state with verified status from localStorage
+if (verified !== null) {
+  initialState.verified = verified;
+}
 
 export const { reset, setEmailVerificationStatus } = authSlice.actions
 export default authSlice.reducer
