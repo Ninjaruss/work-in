@@ -20,7 +20,7 @@ const LoginPage = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const { user, isLoading, isError, isSuccess, message } = useSelector(
+  const { user, verified, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
   )
 
@@ -52,10 +52,21 @@ const LoginPage = () => {
       password,
     }
 
-    dispatch(login(userData)).then(() => {
+    dispatch(login(userData)).then((response) => {
       // Check if login was successful, otherwise show error toast
-      if (!isSuccess && !user && message) {
-        toast.error(message);
+      if (response.payload && response.payload.error) {
+        toast.error(response.payload.message);
+      } else {
+        if (response.payload.verified === false) {
+          // Route to verify-email page if verified is false
+          // Handle case when login fails due to user not being verified
+          if (isError && message === "User not verified") {
+            navigate("/verify-email");
+          }
+        } else {
+          // Route to home page if verified is true
+          navigate("/home");
+        }
       }
     });
   }

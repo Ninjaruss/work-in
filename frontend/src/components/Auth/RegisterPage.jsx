@@ -32,7 +32,7 @@ function RegisterPage() {
     }
 
     if (isSuccess || user) {
-        navigate('/')
+        navigate('/verify-email') // Update to the verification page route
     }
 
     dispatch(reset())

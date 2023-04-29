@@ -21,9 +21,10 @@ import CalendarPage from './components/Calendar/CalendarPage';
 import TimecardPage from './components/Timecard/TimecardPage';
 import ProfilePage from './components/Profile/ProfilePage';
 import OnboardingPage from './components/Onboarding/OnboardingPage';
+import VerifyEmailPage from './components/Auth/VerifyEmailPage'; // Import the VerifyEmailPage component
 
 function App() {
-  const { user } = useSelector((state) => state.auth);
+  const { user, verified } = useSelector((state) => state.auth); // Assuming you have a email `verified` state in your Redux store for email verification status
 
   return (
     <Router>
@@ -37,19 +38,20 @@ function App() {
 
         <Route
           path="/profile"
-          element={user ? <ProfilePage /> : <Navigate to="/" />}
+          element={verified ? (user ? <ProfilePage /> : <Navigate to="/" />) : <Navigate to="/verify-email" />} 
         />
         <Route
           path="/calendar"
-          element={user ? <CalendarPage /> : <Navigate to="/" />}
+          element={verified ? (user ? <CalendarPage /> : <Navigate to="/" />) : <Navigate to="/verify-email" />} 
         />
         <Route
           path="/timecard"
-          element={user ? <TimecardPage /> : <Navigate to="/" />}
+          element={verified ? (user ? <TimecardPage /> : <Navigate to="/" />) : <Navigate to="/verify-email" />}
         />
         <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/*" element={<UndefinedPage />} />
-        </Routes>
+      </Routes>
       <NavbarFooter />
     </Router>
   );
