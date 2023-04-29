@@ -1,17 +1,8 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
-const nodemailer = require('nodemailer');
 
 const User = require('../models/userModel')
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'officialworkin.service@gmail.com',
-    pass: 'Workin2023'
-  }
-});
 
 /*
  TODO: Check if user exists already 
@@ -55,19 +46,9 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     phone,
     password: hashedPassword,
-  });
+  })
 
   if (user) {
-    // Send confirmation email
-    const confirmationLink = `https://work-in.net/confirm/${user._id}`; // Example confirmation link
-    const mailOptions = {
-      from: 'your_email@example.com', // Sender email address
-      to: user.email, // Recipient email address
-      subject: 'Confirm Your Account', // Email subject
-      html: `Thank you for registering. Please click the following link to confirm your account: <a href="${confirmationLink}">${confirmationLink}</a>`, // Email content
-    };
-    await transporter.sendMail(mailOptions); // Send email
-
     res.status(201).json({
       _id: user.id,
       first_name: user.first_name,
@@ -75,9 +56,10 @@ const registerUser = asyncHandler(async (req, res) => {
       email: user.email,
       phone: user.phone,
       token: generateToken(user._id),
-    });
+    })
   } else {
-    res.status(400).json({ error: 'Invalid user data' });
+    res.status(400)
+    throw new Error('Invalid user data')
   }
 })
 
@@ -118,37 +100,6 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 })
 
-// Confirmation link endpoint
-// @desc Confirm user's email
-// @route GET /api/users/confirm/:token
-// @access Public
-const confirmEmail = asyncHandler(async (req, res) => {
-  const { token } = req.params;
-
-  try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Find user by ID
-    const user = await User.findById(decoded.id);
-
-    if (user) {
-      // Update user's email confirmed status
-      user.isEmailConfirmed = true;
-      await user.save();
-
-      res.status(200).json({
-        message: 'Email confirmed successfully',
-      });} else {
-        res.status(404);
-        throw new Error('User not found');
-      }
-    } catch (error) {
-      res.status(400);
-      throw new Error('Invalid token');
-    }
-});
-
 // @desc Get logged in user
 // @route GET /api/users/me
 // @access Private
@@ -164,5 +115,5 @@ const generateToken = (id) => {
 }
 
 module.exports = {
-  registerUser, loginUser, getMe, confirmEmail
+  registerUser, loginUser, getMe
 }
