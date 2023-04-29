@@ -178,7 +178,7 @@ export const authSlice = createSlice({
 })
 
 // Get verified status from localStorage
-const verified = JSON.parse(localStorage.getItem('verified'));
+let verified = JSON.parse(localStorage.getItem('verified'));
 // Update initial state with verified status from localStorage
 if (verified !== null) {
   initialState.verified = verified;
