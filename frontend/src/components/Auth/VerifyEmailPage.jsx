@@ -15,6 +15,8 @@ function VerifyEmailPage() {
     const { isLoading, verified } = useSelector(
         (state) => state.auth
     );
+    const location = useLocation();
+    const token = new URLSearchParams(location.search).get('token');
 
     useEffect(() => {
         if (isError) {
@@ -30,7 +32,7 @@ function VerifyEmailPage() {
 
     const onResendEmail = async () => {
         try {
-            await dispatch(verifyEmail()); // Dispatch the verifyEmail action and wait for it to complete
+            await dispatch(verifyEmail(token)); // Dispatch the verifyEmail action and wait for it to complete
             setIsError(false);
             setIsSuccess(true);
             setMessage('Verification email sent successfully.');
