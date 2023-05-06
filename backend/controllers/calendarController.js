@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const asyncHandler = require('express-async-handler') // replaces try catch blocks
 const Calendar = require('../models/calendarModel');
-const Joi = require('joi'); // data validation
 
 // Create a new calendar
 const newCalendar = asyncHandler(async (req, res) => {
