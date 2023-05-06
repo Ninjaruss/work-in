@@ -12,12 +12,12 @@ function RegisterPage() {
         first_name: '',
         last_name: '',
         email: '',
-        phone: '',
+        // phone: '',
         password: '',
         password2: ''
     })
     
-    const {first_name, last_name, email, phone, password, password2} = formData
+    const {first_name, last_name, email, password, password2} = formData
     
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -52,12 +52,12 @@ function RegisterPage() {
             toast.error('Passwords do not match')
         } else {
             const userData = {
-                first_name, last_name, email, phone, password, password2
+                first_name, last_name, email, password, password2
             }
 
             dispatch(register(userData))
         }
-    }
+    }    
 
     if (isLoading) {
         return <Spinner />
@@ -95,15 +95,18 @@ function RegisterPage() {
                                     <Form.Control type="email" size="lg" placeholder="Enter your email" onChange={onChange} name="email" value={email} className="position-relative" />
                                 </Form.Group>
                             </Col>
+                            {/*
                             <Col xs={1}>
                                 <h4 className="d-flex justify-content-center">OR</h4>
                             </Col>
+                            
                             <Col>
                                 <h4 className="text-start">PHONE</h4>
                                 <Form.Group controlId="phone" className="my-1">
                                     <Form.Control type="text" size="lg" placeholder="Enter your phone number" onChange={onChange} name="phone" value={phone} className="position-relative" />
                                 </Form.Group>
                             </Col>
+                            */}
                         </Row>
                         <h4 className="text-start">PASSWORD</h4>
                         <Form.Group controlId="password">

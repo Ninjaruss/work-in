@@ -96,7 +96,7 @@ const DayViewModal = (props) => {
                 })
                 .catch(error => console.error('Error fetching calendars:', error));
         }
-    }, [user.id]);
+    }, [user, user.id]);
     
     const onClickEvent = useCallback((e) => {
         const { calendarId, id, title, isAllDay, body } = e.event;
@@ -144,7 +144,7 @@ const DayViewModal = (props) => {
             // If events state is not initialized, set the flag to true
             setEventsInitialized(true);
         }
-    }, [events]); 
+    }, [eventsInitialized, user._id, events]); 
 
     const onBeforeCreateEvent = useCallback((eventData) => {
         console.log("createEvent:" + eventData);

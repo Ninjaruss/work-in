@@ -1,7 +1,28 @@
-import React from "react";
-import {Button, Form, Container, Row, Col, Card, Nav} from "react-bootstrap";
+import React, { useEffect } from "react";
+import { useSelector } from 'react-redux';
+import { Container, Card, Nav} from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
+import {
+    getCalendarByUserId,
+  } from '../../features/calendarService';
 
 function HomePage() {
+    const user = useSelector(state => state.auth.user);
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user) {    
+            // Fetch calendars from calendarService
+            getCalendarByUserId(user._id)
+                .then(calendar => {
+                    console.log("Calendar found!");
+                })
+                .catch(error => {
+                    console.error('Error fetching calendars:', error)
+                    navigate('/onboarding') // Update to the verification page route
+                });
+        }
+    }, [navigate, user, user.id]);
 
     return (
         <Container>

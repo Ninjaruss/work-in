@@ -38,7 +38,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-
     "server": "nodemon ../backend/bin/www",
     "dev": "concurrently \"yarn run server\" \"npm run start\""
   },
