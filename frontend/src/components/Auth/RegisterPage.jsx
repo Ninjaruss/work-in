@@ -31,7 +31,7 @@ function RegisterPage() {
         toast.error(message)
     }
 
-    if (isSuccess || user) {
+    if (isSuccess || user.verified == false) {
         navigate('/verify-email') // Update to the verification page route
     }
 

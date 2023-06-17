@@ -6,6 +6,19 @@ const nodemailer = require('nodemailer');
 
 const User = require('../models/userModel')
 
+const generateRandomPassword = () => {
+  const length = 8;
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let password = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    password += characters.charAt(randomIndex);
+  }
+
+  return password;
+};
+
 /*
  TODO: Check if user exists already 
  (duplicates: can have 1 user using email and 1 using phone pointing to same person)
@@ -17,32 +30,35 @@ const User = require('../models/userModel')
 // @route POST /api/users/register
 // @access Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { first_name, last_name, email, phone, password } = req.body
+  const { first_name, last_name, email, phone, password } = req.body;
 
-  // require first/last name and password
-  if (!first_name || !last_name || !password) {
-    res.status(400)
-    throw new Error('Please add all fields')
+  // require first/last name
+  if (!first_name || !last_name) {
+    res.status(400);
+    throw new Error('Please provide both first name and last name');
   }
+
+  // Generate a random password if not provided
+  const generatedPassword = password || generateRandomPassword();
 
   // require either email or phone
   if (!email && !phone) {
-    res.status(400)
-    throw new Error('Please add either email or phone')
+    res.status(400);
+    throw new Error('Please provide either email or phone');
   }
 
   // Check if user exists through either email or phone
-  const userExists_email = await User.findOne({ email })
-  const userExists_phone = await User.findOne({ phone })
+  const userExists_email = await User.findOne({ email });
+  const userExists_phone = await User.findOne({ phone });
 
   if (userExists_email || userExists_phone) {
-    res.status(400)
-    throw new Error('User already exists')
+    res.status(400);
+    throw new Error('User already exists');
   }
 
   // Hash password
-  const salt = await bcrypt.genSalt(10)
-  const hashedPassword = await bcrypt.hash(password, salt)
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(generatedPassword, salt);
 
   // Create user with verification token and verified set to false
   const user = await User.create({
@@ -52,21 +68,16 @@ const registerUser = asyncHandler(async (req, res) => {
     phone,
     password: hashedPassword,
     verified: false,
-  })
+  });
 
   if (user) {
     // Generate email verification token
     const verificationToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: '1d', // set token expiration time as desired
-    })
+    });
 
-    // Send verification email to user with verification token
-    // You can implement the email sending logic here, using a third-party library or service
-    // Example: sendVerificationEmail(email, verificationToken)
-    // Make sure to handle any errors that may occur during email sending
-
-    // Assuming sendVerificationEmail is a function that sends the verification email
-    await sendEmailVerification(email, verificationToken);
+    // Send verification email to user with verification token and generated password
+    await sendEmailVerification(email, verificationToken, password ? undefined : generatedPassword);
 
     res.status(201).json({
       _id: user.id,
@@ -75,14 +86,14 @@ const registerUser = asyncHandler(async (req, res) => {
       email: user.email,
       phone: user.phone,
       verified: user.verified,
-    })
+    });
   } else {
-    res.status(400)
-    throw new Error('Invalid user data')
+    res.status(400);
+    throw new Error('Invalid user data');
   }
-})
+});
 
-const sendEmailVerification = async (email, verificationToken) => {
+const sendEmailVerification = asyncHandler(async (email, verificationToken, generatedPassword) => {
   try {
     // Create a nodemailer transporter
     const transporter = nodemailer.createTransport({
@@ -96,13 +107,19 @@ const sendEmailVerification = async (email, verificationToken) => {
       },
     });
 
+    // Compose the email body
+    let emailBody = 'Please click the link to verify your email address:';
+    if (generatedPassword) {
+      emailBody += `\nYour temporary password is: ${generatedPassword}`;
+    }
+
     // Compose the email
     const mailOptions = {
       from: process.env.SENDINBLUE_SMTP_USER, // Sender email address
       to: email, // Recipient email address
       subject: 'Email Verification', // Email subject
-      text: 'Please click the link to verify your email address:', // Email body
-      html: `<p>Please click the link to verify your email address: <a href="${process.env.APP_URL}/verify-email?token=${verificationToken}">Verify Email</a></p>`, // Email body with HTML
+      text: emailBody, // Email body
+      html: `<p>${emailBody}</p><p><a href="${process.env.APP_URL}/verify-email?token=${verificationToken}">Verify Email</a></p>`, // Email body with HTML
     };
 
     // Send the email
@@ -112,7 +129,7 @@ const sendEmailVerification = async (email, verificationToken) => {
   } catch (error) {
     console.error('Error sending verification email:', error);
   }
-};
+});
 
 // @desc Authenticate a user using phone/email as login w/ password
 // @route POST /api/users/login
