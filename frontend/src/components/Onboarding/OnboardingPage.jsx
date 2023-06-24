@@ -381,12 +381,15 @@ const OnboardingPage = () => {
     if (isStepValid()) {
       alert("Submitted!");
       e.preventDefault();
+      /*
       console.log({
         isOwnerOrAdmin,
         organizationName,
         employees,
         employeeSchedules,
       });
+      */
+
     } else {
       alert("Please fill out all required fields before submitting.");
     }
@@ -430,7 +433,7 @@ const OnboardingPage = () => {
   const isStepValid = () => {
     switch (step) {
       case 0:
-        return organizationName !== "";
+        return organizationName !== "" && isOwnerOrAdmin !== true;
       case 1:
         return employees.length > 0;
       case 2:
