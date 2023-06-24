@@ -156,10 +156,12 @@ const loginUser = asyncHandler(async (req, res) => {
       throw new Error('Invalid email/phone or password');
     }
 
-    if (!user.verified) {
-      res.status(401);
-      throw new Error('Email not verified. Please verify your email.');
-    }
+    /*
+      if (!user.verified) {
+        res.status(401);
+        throw new Error('Email not verified. Please verify your email.');
+      }
+    */
 
     // Generate authentication token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
