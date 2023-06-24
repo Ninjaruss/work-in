@@ -433,7 +433,7 @@ const OnboardingPage = () => {
   const isStepValid = () => {
     switch (step) {
       case 0:
-        return organizationName !== "" && isOwnerOrAdmin !== true;
+        return organizationName !== "" && isOwnerOrAdmin !== false;
       case 1:
         return employees.length > 0;
       case 2:
