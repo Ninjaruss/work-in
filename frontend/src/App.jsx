@@ -48,8 +48,14 @@ function App() {
           path="/timecard"
           element={user && user.verified ? <TimecardPage /> : <Navigate to="/verify-email" />}
         />
-        <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route
+          path="/onboarding"
+          element={user && user.verified ? <OnboardingPage /> : <Navigate to="/verify-email" />}
+        />
+        <Route
+          path="/verify-email"
+          element={user ? <VerifyEmailPage /> : <Navigate to="/" />}
+        />
         <Route path="/*" element={<UndefinedPage />} />
       </Routes>
       <NavbarFooter />
