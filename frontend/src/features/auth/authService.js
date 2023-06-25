@@ -28,6 +28,16 @@ const register = async (userData) => {
   }
 };
 
+// Register user
+const registerAll = async (orgData) => {
+  try {
+    const response = await axios.post(API_URL + 'registerAll', orgData);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to register all users');
+  }
+};
+
 // Login user
 const login = async (userData) => {
   try {
@@ -84,6 +94,7 @@ const verifyEmail = async (verificationToken) => {
 
 const authService = {
   register,
+  registerAll,
   logout,
   login,
   sendEmailVerification,

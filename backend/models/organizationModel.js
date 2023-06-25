@@ -1,23 +1,25 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-import userSchema from "./userModel";
-
-const organizationSchema = mongoose.Schema(
+const organizationSchema = Schema(
   {
     org_name: {
-        type: String,
-        required: true
+      type: String,
+      required: true
     },
     calendar: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: 'Calendar'
     },
-    employees: [userSchema],
+    employees: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }],
   },
   {
     timestamps: true,
   }
-)
+);
 
-module.exports = mongoose.model('Organization', organizationSchema)
+module.exports = mongoose.model('Organization', organizationSchema);

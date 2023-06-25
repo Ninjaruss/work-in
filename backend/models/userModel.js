@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema(
     phone: {
       type: String,
       required: [false, 'Please add a phone number'],
-      unique: true,
+      unique: false,
     },
     
     organization: {

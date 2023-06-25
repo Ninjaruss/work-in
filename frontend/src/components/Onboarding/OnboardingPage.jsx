@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch  } from 'react-redux';
+import { useNavigate } from 'react-router-dom'
 import { Alert, Form, Button, Container, Col, Table, Card, Accordion } from 'react-bootstrap';
 
-import {
-  createCalendar,
-  getCalendarById,
-  updateCalendar,
-  deleteCalendar,
-  getCalendarByUserId,
-  updateCalendarByUserId,
-  updateCalendarByOrganizationId,
-  deleteCalendarByUserId,
-} from '../../features/calendarService';
+import { registerAll } from '../../features/auth/authSlice'
 
 const DAYS_OF_WEEK = {
   Sunday: 'Sun',
@@ -320,6 +312,9 @@ const OnboardingPage = () => {
   const [employeeSchedules, setEmployeeSchedules] = useState([]);
   const [step, setStep] = useState(0);
 
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const handleOwnerOrAdminChange = (event) => {
     setIsOwnerOrAdmin(event.target.checked);
   };
@@ -378,23 +373,62 @@ const OnboardingPage = () => {
   };
 
   const handleSubmit = (e) => {
+    e.preventDefault();
+
     if (isStepValid()) {
-      alert("Submitted!");
-      e.preventDefault();
-      /*
+      // Dispatch the registerAll action or perform any necessary API calls here
+      const orgName = organizationName;
+      const data = {
+        user,
+        orgName,
+        employees: employees.map((employee) => ({
+          first_name: employee.firstName,
+          last_name: employee.lastName,
+          email: employee.email,
+        })),
+        employeeSchedules: employeeSchedules.map((schedule) => {
+          const { Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday } = schedule;
+  
+          return {
+            Monday: Monday.startTime && Monday.endTime ? { startTime: Monday.startTime, endTime: Monday.endTime } : null,
+            Tuesday: Tuesday.startTime && Tuesday.endTime ? { startTime: Tuesday.startTime, endTime: Tuesday.endTime } : null,
+            Wednesday: Wednesday.startTime && Wednesday.endTime ? { startTime: Wednesday.startTime, endTime: Wednesday.endTime } : null,
+            Thursday: Thursday.startTime && Thursday.endTime ? { startTime: Thursday.startTime, endTime: Thursday.endTime } : null,
+            Friday: Friday.startTime && Friday.endTime ? { startTime: Friday.startTime, endTime: Friday.endTime } : null,
+            Saturday: Saturday.startTime && Saturday.endTime ? { startTime: Saturday.startTime, endTime: Saturday.endTime } : null,
+            Sunday: Sunday.startTime && Sunday.endTime ? { startTime: Sunday.startTime, endTime: Sunday.endTime } : null,
+          };
+        }),
+      };
+
       console.log({
-        isOwnerOrAdmin,
-        organizationName,
-        employees,
-        employeeSchedules,
+        data
       });
-      */
 
+      dispatch(registerAll(data))
+        .then((response) => {
+          // Check for errors in the response
+          if (response.error) {
+            // Handle the error returned by the backend
+            console.log('Backend error:', response.error);
+            // Display an error message or handle the error in an appropriate way
+            alert('An error occurred while submitting the form. Please try again later.');
+          } else {
+            // Submission was successful
+            // Redirect to a success page or display a success message
+
+            // navigate('/home');
+          }
+        })
+        .catch((error) => {
+          // Handle dispatch or network error
+          console.log('Error:', error);
+          // Display an error message or handle the error in an appropriate way
+          alert('An error occurred while submitting the form. Please try again later.');
+        });
     } else {
-      alert("Please fill out all required fields before submitting.");
+      alert('Please fill out all required fields before submitting.');
     }
-
-    
   };
 
   /*

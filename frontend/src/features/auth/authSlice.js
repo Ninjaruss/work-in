@@ -43,6 +43,26 @@ export const register = createAsyncThunk(
   }
 );
 
+// Register user
+export const registerAll = createAsyncThunk(
+  'auth/registerAll',
+  async (data, thunkAPI) => {
+    const { user, orgName, employees, employeeSchedules } = data; // Extract email from user object
+
+    try {
+      return await authService.registerAll(data);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Async thunk for verifying email
 export const verifyEmail = createAsyncThunk(
   'auth/verifyEmail',
@@ -119,6 +139,18 @@ export const authSlice = createSlice({
         state.isError = true
         state.message = action.payload || '' // Set empty string if no message
         state.user = null
+      })
+      .addCase(registerAll.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(registerAll.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+      })
+      .addCase(registerAll.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload || '' // Set empty string if no message
       })
       .addCase(login.pending, (state) => {
         state.isLoading = true
