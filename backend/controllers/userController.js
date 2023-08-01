@@ -51,18 +51,18 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Check if user exists through either email or phone
-  console.log('--^--')
-  console.log(first_name)
-  console.log(last_name)
-  console.log(email)
-  console.log(password)
-  console.log(organization)
+  console.log('--^--');
+  console.log(first_name);
+  console.log(last_name);
+  console.log(email);
+  console.log(password);
+  console.log(organization);
 
   const userExists_email = await User.findOne({ email });
   // const userExists_phone = await User.findOne({ phone });
 
   if (userExists_email) {
-    console.log('5')
+    console.log('5');
     res.status(400);
     throw new Error('User already exists');
   }
@@ -91,15 +91,29 @@ const registerUser = asyncHandler(async (req, res) => {
     // Send verification email to user with verification token and generated password
     await sendEmailVerification(email, verificationToken, password ? undefined : generatedPassword);
 
-    res.status(201).json({
-      _id: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      phone: user.phone,
-      verified: user.verified,
-      organization: user.organization,
-    });
+    // If `res` is available (called from `registerAll`), send the response directly
+    if (res) {
+      res.status(201).json({
+        _id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        phone: user.phone,
+        verified: user.verified,
+        organization: user.organization,
+      });
+    } else {
+      // If `res` is not available (called independently), return the user object
+      return {
+        _id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        phone: user.phone,
+        verified: user.verified,
+        organization: user.organization,
+      };
+    }
   } else {
     res.status(400);
     throw new Error('Invalid user data');
@@ -108,20 +122,19 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const registerAll = async (req, res) => {
   try {
-    const { user, orgName, employees, employeeSchedules } = req.body;
+    const { user, orgName, orgType, employees, employeeSchedules } = req.body;
 
-    console.log("[-^-]")
-    console.log(employees)
-    console.log(employeeSchedules)
-    console.log("[---]")
-
+    // Create the organization calendar
     const organizationCalendar = await Calendar.create({ userId: user._id, events: [] });
-    const organization = await Organization.create({ org_name: orgName, calendar: organizationCalendar._id });
-    
+
+    // Create the organization
+    const organization = await Organization.create({ org_name: orgName, org_type: orgType, calendar: organizationCalendar._id });
+
     // Update organizationCalendar with organizationId
     organizationCalendar.organizationId = organization._id;
     await organizationCalendar.save();
 
+    // Loop through employees and register them
     for (let i = 0; i < employees.length; i++) {
       const employee = employees[i];
       const schedule = employeeSchedules[i];
@@ -138,49 +151,58 @@ const registerAll = async (req, res) => {
           password: null, // Password will be generated automatically
           organization: organization._id, // Assign the organization to the user
         },
-        res: req.res,
+        res: res,
       };
-      
-      await registerUser(registerUserReq);
 
-      // Obtain user's _id
-      const registeredUser = await User.findOne({ email });
-      const userId = registeredUser._id;
+      // Call registerUser function
+      const newUser = await registerUser(registerUserReq);
+
+      // Obtain user's _id from the returned newUser object
+      const userId = newUser._id;
 
       // Create an array to store the events
       const events = [];
 
-      // Iterate over the properties of the schedule object
-      for (const [day, { startTime, endTime }] of Object.entries(schedule)) {
-        // Skip any non-day properties
-        if (!['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].includes(day)) {
-          continue;
+      // Check if schedule is valid and has properties
+      if (schedule && typeof schedule === 'object' && Object.keys(schedule).length > 0) {
+        // Iterate over the days in the schedule object
+        for (const day in schedule) {
+          if (schedule.hasOwnProperty(day) && schedule[day] && schedule[day].startTime && schedule[day].endTime) {
+            const { startTime, endTime } = schedule[day];
+
+            // Skip null days
+            if (schedule[day] !== null && startTime !== null && endTime !== null && startTime !== '' && endTime !== '') {
+              // Create Date objects from the provided startTime and endTime
+              const start = new Date(startTime);
+              const end = new Date(endTime);
+
+              // Ensure that start and end are valid Date objects
+              if (!isNaN(start) && !isNaN(end)) {
+                // Create an event object using the schedule information
+                const event = {
+                  id: String(uuidv4()), // Generate a unique ID for the event
+                  calendarId: 'company', // Generate a unique ID for the calendar
+                  category: 'time',
+                  title: 'Work Schedule',
+                  body: 'Event generated by admin',
+                  start: start, // Set the start date/time of the event
+                  end: end, // Set the end date/time of the event
+                  isAllDay: false, // Set whether the event is an all-day event or not
+                };
+
+                // Add the event object to the events array
+                events.push(event);
+              }
+            }
+          }
         }
 
-        // Create an event object using the schedule information
-        const event = {
-          id: String(uuidv4()), // Generate a unique ID for the event
-          calendarId: 'company', // Generate a unique ID for the calendar
-          category: 'time',
-          title: 'Work Schedule',
-          body: 'Event generated by admin',
-          start: new Date(startTime), // Set the start date/time of the event
-          end: new Date(endTime), // Set the end date/time of the event
-          isAllDay: false, // Set whether the event is an all-day event or not
-        };
+        // Create a calendar object using the user's _id and the events array
+        const userCalendar = await Calendar.create({ userId, events });
 
-        // Add the event object to the events array
-        events.push(event);
+        // Save the calendar object in the database
+        await userCalendar.save();
       }
-
-      // Create a calendar object using the user's _id and the events array
-      const userCalendar = await Calendar.create({
-        userId,
-        events,
-      });
-
-      // Save the calendar object in the database
-      await userCalendar.save();
     }
 
     res.status(200).json({ message: 'Users registered and calendars saved successfully!' });

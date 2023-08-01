@@ -15,7 +15,33 @@ const DAYS_OF_WEEK = {
   Saturday: 'Sat',
 };
 
-const OwnerOrAdminStep = ({ isOwnerOrAdmin, handleOwnerOrAdminChange, organizationName, handleOrganizationNameChange }) => {
+const ORGANIZATION_TYPES = [
+  "Agriculture; plantations; other rural sectors",
+  "Basic Metal Production",
+  "Chemical industries",
+  "Commerce",
+  "Construction",
+  "Education",
+  "Financial services; professional services",
+  "Food; drink; tobacco",
+  "Forestry; wood; pulp and paper",
+  "Health services",
+  "Hotels; tourism; catering",
+  "Mining (coal; other mining)",
+  "Mechanical and electrical engineering",
+  "Media; culture; graphical",
+  "Oil and gas production; oil refining",
+  "Postal and telecommunications services",
+  "Public service",
+  "Shipping; ports; fisheries; inland waterways",
+  "Textiles; clothing; leather; footwear",
+  "Transport (including civil aviation; railways; road transport)",
+  "Transport equipment manufacturing",
+  "Utilities (water; gas; electricity)",
+];
+
+
+const OwnerOrAdminStep = ({ isOwnerOrAdmin, handleOwnerOrAdminChange, organizationName, handleOrganizationNameChange, orgType, handleOrgTypeChange }) => {
   return (
     <Accordion.Item eventKey="0">
       <Accordion.Header>Step 1: Are you a business owner or administrator?</Accordion.Header>
@@ -30,6 +56,17 @@ const OwnerOrAdminStep = ({ isOwnerOrAdmin, handleOwnerOrAdminChange, organizati
           <Form.Group>
             <Form.Label>Organization Name</Form.Label>
             <Form.Control type="text" value={organizationName} onChange={handleOrganizationNameChange} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Organization Type</Form.Label>
+            <Form.Control as="select" value={orgType} onChange={handleOrgTypeChange}>
+              <option value="">Select an organization type</option>
+              {ORGANIZATION_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
         </Accordion.Body>
       </Accordion.Collapse>
@@ -88,75 +125,46 @@ const EmployeeStep = ({ newEmployee, handleNewEmployeeChange, handleAddEmployee,
 };
 
 const ScheduleStep = ({ employeeSchedules, setEmployeeSchedules, employees }) => {
-  const [errors, setErrors] = useState([]);
-
-  const handleScheduleChange = (employeeIndex, dayOfWeek, field, value) => {
+  const handleSelectChange = (employeeIndex, dayOfWeek, value) => {
     const newSchedules = [...employeeSchedules];
     const schedule = newSchedules[employeeIndex][dayOfWeek];
-    let roundedValue = value;
-  
-    if (field === 'startTime' || field === 'endTime') {
-      const time = new Date(`2000-01-01T${value}`);
-      const roundedMinutes = Math.round(time.getMinutes() / 30) * 30;
-      time.setMinutes(roundedMinutes);
-      roundedValue = time.toTimeString().substring(0, 5);
+    switch (value) {
+      case 'full':
+        newSchedules[employeeIndex][dayOfWeek] = {
+          ...schedule,
+          isChecked: true,
+          startTime: '00:00',
+          endTime: '23:59',
+        };
+        break;
+      case 'custom':
+        newSchedules[employeeIndex][dayOfWeek] = {
+          ...schedule,
+          isChecked: true,
+          startTime: '',
+          endTime: '',
+        };
+        break;
+      default:
+        newSchedules[employeeIndex][dayOfWeek] = {
+          ...schedule,
+          isChecked: false,
+          startTime: '',
+          endTime: '',
+        };
     }
-  
-    newSchedules[employeeIndex][dayOfWeek] = {
-      ...schedule,
-      [field]: roundedValue,
-    };
-  
-    // check if start time is after end time, and vice versa
-    const start = new Date(`2000-01-01T${newSchedules[employeeIndex][dayOfWeek].startTime}`);
-    const end = new Date(`2000-01-01T${newSchedules[employeeIndex][dayOfWeek].endTime}`);
-
-    if (field === 'startTime' && schedule.endTime && start >= end) {
-      newSchedules[employeeIndex][dayOfWeek] = {
-        ...schedule,
-        startTime: schedule.endTime,
-      };
-      setErrors([
-        ...errors.filter((error) => !error.includes(DAYS_OF_WEEK[dayOfWeek])),
-        `${DAYS_OF_WEEK[dayOfWeek]} start time should be before end time.`,
-      ]);
-    } else if (field === 'endTime' && schedule.startTime && start >= end) {
-      newSchedules[employeeIndex][dayOfWeek] = {
-        ...schedule,
-        endTime: schedule.startTime,
-      };
-      setErrors([
-        ...errors.filter((error) => !error.includes(DAYS_OF_WEEK[dayOfWeek])),
-        `${DAYS_OF_WEEK[dayOfWeek]} end time should be after start time.`,
-      ]);
-    } else if ((field === 'startTime' || field === 'endTime') && schedule.startTime && schedule.endTime && roundedValue === schedule.endTime) {
-      newSchedules[employeeIndex][dayOfWeek] = {
-        ...schedule,
-        startTime: '',
-      };
-      setErrors([
-        ...errors.filter((error) => !error.includes(DAYS_OF_WEEK[dayOfWeek])),
-        `${DAYS_OF_WEEK[dayOfWeek]} start time cannot be the same as end time.`,
-      ]);
-    } else if ((field === 'startTime' || field === 'endTime') && schedule.startTime && schedule.endTime && roundedValue === schedule.startTime) {
-      newSchedules[employeeIndex][dayOfWeek] = {
-        ...schedule,
-        endTime: '',
-      };
-      setErrors([
-        ...errors.filter((error) => !error.includes(DAYS_OF_WEEK[dayOfWeek])),
-        `${DAYS_OF_WEEK[dayOfWeek]} end time cannot be the same as start time.`,
-      ]);
-    } else {
-      setErrors(errors.filter((error) => !error.includes(DAYS_OF_WEEK[dayOfWeek])));
-    }
-    
     setEmployeeSchedules(newSchedules);
   };
-  
-  const handleCheckboxChange = (employeeIndex, dayOfWeek, isChecked) => {
-    handleScheduleChange(employeeIndex, dayOfWeek, 'isChecked', isChecked);
-  }
+
+  const handleTimeChange = (employeeIndex, dayOfWeek, field, value) => {
+    const newSchedules = [...employeeSchedules];
+    const schedule = newSchedules[employeeIndex][dayOfWeek];
+    newSchedules[employeeIndex][dayOfWeek] = {
+      ...schedule,
+      [field]: value,
+    };
+    setEmployeeSchedules(newSchedules);
+  };
 
   return (
     <Accordion.Item eventKey="2">
@@ -180,14 +188,14 @@ const ScheduleStep = ({ employeeSchedules, setEmployeeSchedules, employees }) =>
                     const schedule = employeeSchedules[index][dayOfWeek];
                     return (
                       <td key={`${employee.firstName}-${dayOfWeek}`}>
-                        <div>
-                          <Form.Check 
-                            type="checkbox" 
-                            label={DAYS_OF_WEEK[dayOfWeek]}
-                            checked={schedule.isChecked}
-                            onChange={(event) => handleCheckboxChange(index, dayOfWeek, event.target.checked)}
-                          />
-                        </div>
+                        <Form.Select
+                          value={schedule.isChecked ? 'custom' : schedule.startTime || schedule.endTime ? 'full' : 'none'}
+                          onChange={(e) => handleSelectChange(index, dayOfWeek, e.target.value)}
+                        >
+                          <option value="none">No Schedule</option>
+                          <option value="full">Full Day</option>
+                          <option value="custom">Custom Schedule</option>
+                        </Form.Select>
                         {schedule.isChecked && (
                           <>
                             <div>
@@ -195,7 +203,7 @@ const ScheduleStep = ({ employeeSchedules, setEmployeeSchedules, employees }) =>
                               <Form.Control
                                 type="time"
                                 value={schedule.startTime}
-                                onChange={(event) => handleScheduleChange(index, dayOfWeek, 'startTime', event.target.value)}
+                                onChange={(e) => handleTimeChange(index, dayOfWeek, 'startTime', e.target.value)}
                               />
                             </div>
                             <div>
@@ -203,14 +211,12 @@ const ScheduleStep = ({ employeeSchedules, setEmployeeSchedules, employees }) =>
                               <Form.Control
                                 type="time"
                                 value={schedule.endTime}
-                                onChange={(event) => handleScheduleChange(index, dayOfWeek, 'endTime', event.target.value)}
+                                onChange={(e) => handleTimeChange(index, dayOfWeek, 'endTime', e.target.value)}
                               />
                             </div>
-                            {errors
-                              .filter((error) => error.includes(DAYS_OF_WEEK[dayOfWeek]))
-                              .map((error, index) => (
-                                <Alert key={`${employee.firstName}-${dayOfWeek}-error-${index}`} variant="danger">{error}</Alert>
-                              ))}
+                            {(schedule.startTime && !schedule.endTime) || (!schedule.startTime && schedule.endTime) ? (
+                              <Alert variant="danger">Please specify both start and end times.</Alert>
+                            ) : null}
                           </>
                         )}
                       </td>
@@ -303,17 +309,22 @@ const ReviewStep = ({ isOwnerOrAdmin, organizationName, employees, employeeSched
 };
 
 const OnboardingPage = () => {
-  const user = useSelector(state => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
 
   const [isOwnerOrAdmin, setIsOwnerOrAdmin] = useState(false);
   const [organizationName, setOrganizationName] = useState('');
+  const [organizationType, setOrgType] = useState(''); // Added orgType state
   const [newEmployee, setNewEmployee] = useState({ firstName: '', lastName: '', email: '' });
   const [employees, setEmployees] = useState([]);
   const [employeeSchedules, setEmployeeSchedules] = useState([]);
   const [step, setStep] = useState(0);
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleOrgTypeChange = (event) => {
+    setOrgType(event.target.value);
+  };
 
   const handleOwnerOrAdminChange = (event) => {
     setIsOwnerOrAdmin(event.target.checked);
@@ -378,9 +389,11 @@ const OnboardingPage = () => {
     if (isStepValid()) {
       // Dispatch the registerAll action or perform any necessary API calls here
       const orgName = organizationName;
+      const orgType = organizationType;
       const data = {
         user,
         orgName,
+        orgType,
         employees: employees.map((employee) => ({
           first_name: employee.firstName,
           last_name: employee.lastName,
@@ -406,26 +419,26 @@ const OnboardingPage = () => {
       });
 
       dispatch(registerAll(data))
-        .then((response) => {
-          // Check for errors in the response
-          if (response.error) {
-            // Handle the error returned by the backend
-            console.log('Backend error:', response.error);
-            // Display an error message or handle the error in an appropriate way
-            alert('An error occurred while submitting the form. Please try again later.');
-          } else {
-            // Submission was successful
-            // Redirect to a success page or display a success message
+      .then((response) => {
+        console.log('Response from API:', response);
 
-            // navigate('/home');
-          }
-        })
-        .catch((error) => {
-          // Handle dispatch or network error
-          console.log('Error:', error);
+        if (response.error) {
+          // Handle the error returned by the backend
+          console.log('Backend error:', response.error);
           // Display an error message or handle the error in an appropriate way
           alert('An error occurred while submitting the form. Please try again later.');
-        });
+        } else {
+          // Submission was successful
+          // Redirect to a success page or display a success message
+          // navigate('/home');
+        }
+      })
+      .catch((error) => {
+        // Handle dispatch or network error
+        console.log('Error:', error);
+        // Display an error message or handle the error in an appropriate way
+        alert('An error occurred while submitting the form. Please try again later.');
+      });
     } else {
       alert('Please fill out all required fields before submitting.');
     }
@@ -499,11 +512,13 @@ const OnboardingPage = () => {
       case 0:
         return (
           <OwnerOrAdminStep
-            isOwnerOrAdmin={isOwnerOrAdmin}
-            handleOwnerOrAdminChange={handleOwnerOrAdminChange}
-            organizationName={organizationName}
-            handleOrganizationNameChange={handleOrganizationNameChange}
-            handleNext={handleNext}
+              isOwnerOrAdmin={isOwnerOrAdmin}
+              handleOwnerOrAdminChange={handleOwnerOrAdminChange}
+              organizationName={organizationName}
+              handleOrganizationNameChange={handleOrganizationNameChange}
+              organizationType={organizationType}
+              handleOrgTypeChange={handleOrgTypeChange}
+              handleNext={handleNext}
           />
         );
       case 1:

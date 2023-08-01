@@ -34,6 +34,7 @@ const registerAll = async (orgData) => {
     const response = await axios.post(API_URL + 'registerAll', orgData);
     return response.data;
   } catch (error) {
+    console.error('Error in registerAll API call:', error);
     throw new Error('Failed to register all users');
   }
 };

@@ -65,3 +65,7 @@ const deleteOrganizationByUserId = asyncHandler(async (req, res) => {
     }
     res.send(organization);
 });
+
+module.exports = {
+  newOrganization, getOrganization, getOrganizationByUserId, updateOrganization, deleteOrganization, deleteOrganizationByUserId
+}

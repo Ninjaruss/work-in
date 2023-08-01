@@ -16,6 +16,10 @@ const organizationSchema = Schema(
       type: Schema.Types.ObjectId,
       ref: 'User'
     }],
+    org_type: {
+      type: String,
+      required: false
+    },
   },
   {
     timestamps: true,

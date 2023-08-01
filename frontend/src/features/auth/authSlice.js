@@ -43,7 +43,7 @@ export const register = createAsyncThunk(
   }
 );
 
-// Register user
+// Register multiple users
 export const registerAll = createAsyncThunk(
   'auth/registerAll',
   async (data, thunkAPI) => {
@@ -52,6 +52,7 @@ export const registerAll = createAsyncThunk(
     try {
       return await authService.registerAll(data);
     } catch (error) {
+      console.error('Error in registerAll async thunk:', error);
       const message =
         (error.response &&
           error.response.data &&
@@ -62,6 +63,7 @@ export const registerAll = createAsyncThunk(
     }
   }
 );
+
 
 // Async thunk for verifying email
 export const verifyEmail = createAsyncThunk(
