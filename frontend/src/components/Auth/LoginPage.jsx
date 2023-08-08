@@ -99,15 +99,6 @@ const LoginPage = () => {
                             <Form.Control type="email" size="lg" name='email' value={email} placeholder="Enter your email address" className="position-relative" onChange={onChange}/>
                         </Form.Group>
                       </Col>
-                      <Col xs={1}>
-                        <h4 className="d-flex justify-content-center">OR</h4>
-                      </Col>
-                      <Col>
-                        <Form.Group controlId="phone" className="my-1">
-                          <h4 className="text-start">PHONE</h4>
-                          <Form.Control type="text" size="lg" name='phone'  value={phone} placeholder="Enter your phone number" className="position-relative" onChange={onChange}/>
-                        </Form.Group>
-                      </Col>
                     </Row>
 
                     <Form.Group controlId="password">
