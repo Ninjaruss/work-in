@@ -83,11 +83,12 @@ const verifyEmail = async (verificationToken) => {
   }
 };
 
-const resendEmailVerification = async (email) => {
+const sendEmailVerification = async (email) => {
   try {
-    const response = await axios.post(API_URL + 'resendEmailVerification', { email });
+    const response = await axios.post(API_URL + 'sendEmailVerification', { email });
 
-    if (response.data && response.data.data && response.data.data.emailVerified) {
+    // Update this condition based on the actual response structure
+    if (response.data && response.data.verified) {
       // Update Redux store with email verification status
       return true;
     }
@@ -102,7 +103,7 @@ const authService = {
   registerAll,
   logout,
   login,
-  resendEmailVerification,
+  sendEmailVerification,
   verifyEmail
 };
 

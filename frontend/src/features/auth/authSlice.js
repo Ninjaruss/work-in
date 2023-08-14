@@ -86,12 +86,12 @@ export const verifyEmail = createAsyncThunk(
 );
 
 // Async thunk for sending email verification request
-export const resendEmailVerification = createAsyncThunk(
-  'auth/resendEmailVerification',
+export const sendEmailVerification = createAsyncThunk(
+  'auth/sendEmailVerification',
   async (email, thunkAPI) => {
     try {
       // Call the backend API to send email verification request
-      await authService.resendEmailVerification(email);
+      await authService.sendEmailVerification(email);
       return; // Add return statement here
     } catch (error) {
       // Handle error, e.g. show error message or dispatch failure action

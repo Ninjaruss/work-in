@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { reset, verifyEmail, resendEmailVerification } from '../../features/auth/authSlice';
+import { reset, verifyEmail, sendEmailVerification } from '../../features/auth/authSlice';
 import Spinner from '../../components/common/Spinner';
 import { Container, Button, Card, Form } from "react-bootstrap";
 
@@ -48,7 +48,7 @@ function VerifyEmailPage() {
   const onResendEmail = async () => {
     try {
       // Pass the user's email to the action
-      await dispatch(resendEmailVerification({ email: user.email }));
+      await dispatch(sendEmailVerification({ email: user.email }));
       setIsError(false);
       setIsSuccess(true);
       setMessage('Verification email sent successfully.');
