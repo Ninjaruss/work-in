@@ -99,7 +99,7 @@ const registerUser = asyncHandler(async (req, res) => {
     phone: '',
     password: hashedPassword,
     verified: false,
-    organization
+    organization,
   });
 
   if (user) {
@@ -137,6 +137,14 @@ const registerUser = asyncHandler(async (req, res) => {
   } else {
     res.status(400);
     throw new Error('Invalid user data');
+  }
+
+  // Update the owner's organization if it's available
+  if (organization && user._id) {
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { organization: organization } }
+    );
   }
 });
 
@@ -247,6 +255,14 @@ const registerAll = async (req, res) => {
       }
     }
 
+    // Update the owner's organization if it's available
+    if (organization && user._id) {
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { organization: organization._id } }
+      );
+    }
+
     res.status(200).json({ message: 'Users registered and calendars saved successfully!' });
   } catch (error) {
     console.error('Error registering users and saving calendars:', error);
@@ -352,8 +368,8 @@ const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.body;
 
   if (!token) {
-    res.status(400);
-    return res.json({ error: 'Invalid token' }); // return the error response
+    res.status(400).json({ error: 'Invalid token' });
+    return;
   }
 
   try {
@@ -363,23 +379,22 @@ const verifyEmail = asyncHandler(async (req, res) => {
     const user = await User.findById(decoded.userId);
 
     if (!user) {
-      res.status(404);
-      return res.json({ error: 'User not found' }); // return the error response
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
 
     if (user.verified) {
-      res.status(400);
-      return res.json({ error: 'Email already verified' }); // return the error response
+      res.status(400).json({ error: 'Email already verified' });
+      return;
     }
 
     user.verified = true;
     await user.save();
 
-    return res.json({ message: 'Email verified successfully' }); // return the success response
+    res.status(200).json({ message: 'Email verified successfully' });
   } catch (error) {
     // Handle any other errors that may occur during verification
-    res.status(500);
-    return res.json({ error: 'Failed to verify email' }); // return the error response
+    res.status(500).json({ error: 'Failed to verify email' });
   }
 });
 
