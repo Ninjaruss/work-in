@@ -272,6 +272,18 @@ const registerAll = async (req, res) => {
 
 const sendEmailVerification = asyncHandler(async (email, verificationToken, generatedPassword) => {
   try {
+    // Generate verification token if not provided
+    if (!verificationToken) {
+      verificationToken = jwt.sign({ userId: userId }, process.env.JWT_SECRET, {
+        expiresIn: '1d', // set token expiration time as desired
+      });
+    }
+
+    // Generate a random password if not provided
+    if (!generatedPassword) {
+      generatedPassword = generateRandomPassword();
+    }
+
     // Create a nodemailer transporter
     const transporter = nodemailer.createTransport({
       // Specify SMTP settings using environment variables
@@ -285,10 +297,8 @@ const sendEmailVerification = asyncHandler(async (email, verificationToken, gene
     });
 
     // Compose the email body
-    let emailBody = 'Please click the link to verify your email address:';
-    if (generatedPassword) {
-      emailBody += `\nYour temporary password is: ${generatedPassword}`;
-    }
+    let emailBody = `Please click the link to verify your email address: ${process.env.APP_URL}/verify-email?token=${verificationToken}`;
+    emailBody += `\nYour temporary password is: ${generatedPassword}`;
 
     // Compose the email
     const mailOptions = {
@@ -305,6 +315,7 @@ const sendEmailVerification = asyncHandler(async (email, verificationToken, gene
     console.log('Verification email sent successfully!');
   } catch (error) {
     console.error('Error sending verification email:', error);
+    throw new Error('Error sending verification email');
   }
 });
 
