@@ -109,7 +109,7 @@ const registerUser = asyncHandler(async (req, res) => {
     });
 
     // Send verification email to user with verification token and generated password
-    await sendEmailVerification(email, verificationToken, password ? undefined : generatedPassword);
+    await resendEmailVerification(email, verificationToken, password ? undefined : generatedPassword);
 
     // If `res` is available (called from `registerAll`), send the response directly
     if (res) {
@@ -270,7 +270,7 @@ const registerAll = async (req, res) => {
   }
 };
 
-const sendEmailVerification = asyncHandler(async (email, verificationToken, generatedPassword) => {
+const resendEmailVerification = asyncHandler(async (email, verificationToken, generatedPassword) => {
   try {
     // Create a nodemailer transporter
     const transporter = nodemailer.createTransport({
@@ -413,5 +413,5 @@ const generateToken = (id) => {
 }
 
 module.exports = {
-  registerUser, registerAll, loginUser, getMe, verifyEmail, sendEmailVerification, generateToken
+  registerUser, registerAll, loginUser, getMe, verifyEmail, resendEmailVerification, generateToken
 }
