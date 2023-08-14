@@ -65,31 +65,35 @@ const logout = () => {
   localStorage.removeItem('user');
 };
 
-// Send email verification request
-const sendEmailVerification = async (email, verificationToken) => {
+// Verify email
+const verifyEmail = async (verificationToken) => {
   try {
-    const response = await axios.post(API_URL + 'sendEmailVerification', { email, token: verificationToken });
+    const response = await axios.post(API_URL + 'verifyEmail', { token: verificationToken });
 
-    if (response.data && response.data.data) {
+    if (response.data && response.data.message === 'Email verified successfully') {
       // Update Redux store with email verification status
-      // Assuming response.data.data.emailVerified is a boolean value indicating whether the email is verified or not
-      return Boolean(response.data.data.verified);
+      // Assuming response.data.emailVerified is a boolean value indicating whether the email is verified or not
+      return true;
+    } else {
+      throw new Error('Email verification failed');
     }
   } catch (error) {
-    throw new Error('Failed to send email verification request');
+    console.error('Error verifying email:', error);
+    throw new Error('Failed to verify email');
   }
 };
 
-// Verify email
-const verifyEmail = async (verificationToken) => {
-  const response = await axios.post(API_URL + 'verifyEmail', { token: verificationToken });
+const resendEmailVerification = async (email) => {
+  try {
+    const response = await axios.post(API_URL + 'resendEmailVerification', { email });
 
-  if (response.data && response.data.message === 'Email verified successfully') {
-    // Update Redux store with email verification status
-    // Assuming response.data.emailVerified is a boolean value indicating whether the email is verified or not
-    return true;
-  } else {
-    throw new Error('Email verification failed');
+    if (response.data && response.data.data && response.data.data.emailVerified) {
+      // Update Redux store with email verification status
+      return true;
+    }
+  } catch (error) {
+    console.error('Error resending verification email:', error);
+    throw new Error('Failed to resend verification email');
   }
 };
 
@@ -98,7 +102,7 @@ const authService = {
   registerAll,
   logout,
   login,
-  sendEmailVerification,
+  resendEmailVerification,
   verifyEmail
 };
 

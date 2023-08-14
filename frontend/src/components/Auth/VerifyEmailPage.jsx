@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { reset, verifyEmail } from '../../features/auth/authSlice';
+import { reset, verifyEmail, resendEmailVerification } from '../../features/auth/authSlice';
 import Spinner from '../../components/common/Spinner';
 import { Container, Button, Card, Form } from "react-bootstrap";
 
@@ -12,7 +12,7 @@ function VerifyEmailPage() {
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [message, setMessage] = useState('');
-  const { isLoading, verified } = useSelector(
+  const { isLoading, verified, user } = useSelector(
     (state) => state.auth
   );
   const location = useLocation();
@@ -31,22 +31,31 @@ function VerifyEmailPage() {
   }, [isError, isSuccess, message, dispatch]);
 
   useEffect(() => {
-    // Check if the user is already verified on component mount
     if (token) {
-      dispatch(verifyEmail(token));
+      dispatch(verifyEmail(token))
+        .unwrap()
+        .then(() => {
+          toast.success('Email verified successfully.');
+          navigate('/login');
+        })
+        .catch(error => {
+          toast.error(error.message || 'Failed to verify email.');
+          navigate('/verify-email'); // Redirect back to verification page
+        });
     }
-  }, [dispatch, token]);
+  }, [dispatch, token, navigate]);
 
   const onResendEmail = async () => {
     try {
-      await dispatch(verifyEmail(token));
+      // Pass the user's email to the action
+      await dispatch(resendEmailVerification({ email: user.email }));
       setIsError(false);
       setIsSuccess(true);
       setMessage('Verification email sent successfully.');
     } catch (error) {
       setIsError(true);
       setIsSuccess(false);
-      setMessage(error.message);
+      setMessage(error.message || 'Failed to send verification email.');
     }
   };
 
@@ -54,22 +63,45 @@ function VerifyEmailPage() {
     return <Spinner />;
   }
 
-  if (verified) {
+  if (!user) {
     return (
       <Container id="main-container" className="d-grid h-100 w-50">
         <Card className="my-5">
           <Card.Header>
             <h1 className="mb-3 fs-3 fw-normal my-3">
-              Email Verified
+              Email Verification
             </h1>
           </Card.Header>
           <Card.Body>
             <p>
-              Your email has already been verified. Please proceed to the login page.
+              You need to be logged in to verify your email. Please proceed to the login page.
             </p>
             <Form.Group>
               <div className="d-grid">
                 <Button variant="info" size="lg" onClick={() => navigate('/login')}>Go to Login</Button>
+              </div>
+            </Form.Group>
+          </Card.Body>
+        </Card>
+      </Container>
+    );
+  }  
+
+  if (verified) {
+    // Update this part to show a message that the email is already verified
+    return (
+      <Container id="main-container" className="d-grid h-100 w-50">
+        <Card className="my-5">
+          <Card.Header>
+            <h1 className="mb-3 fs-3 fw-normal my-3">Email Verified</h1>
+          </Card.Header>
+          <Card.Body>
+            <p>Your email has already been verified. Please proceed to the login page.</p>
+            <Form.Group>
+              <div className="d-grid">
+                <Button variant="info" size="lg" onClick={() => navigate('/login')}>
+                  Go to Login
+                </Button>
               </div>
             </Form.Group>
           </Card.Body>

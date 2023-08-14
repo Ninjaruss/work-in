@@ -70,8 +70,10 @@ export const verifyEmail = createAsyncThunk(
   'auth/verifyEmail',
   async (token, thunkAPI) => {
     try {
-      // Call the backend API to verify email
       await authService.verifyEmail(token);
+      // Clear user data from local storage after successful verification
+      localStorage.removeItem('user');
+      return true;
     } catch (error) {
       // Handle error, e.g. show error message or dispatch failure action
       const message =
@@ -84,16 +86,20 @@ export const verifyEmail = createAsyncThunk(
 );
 
 // Async thunk for sending email verification request
-export const sendEmailVerification = createAsyncThunk(
-  'auth/sendEmailVerification',
+export const resendEmailVerification = createAsyncThunk(
+  'auth/resendEmailVerification',
   async (email, thunkAPI) => {
     try {
       // Call the backend API to send email verification request
-      await authService.sendEmailVerification(email);
+      await authService.resendEmailVerification(email);
       return; // Add return statement here
     } catch (error) {
       // Handle error, e.g. show error message or dispatch failure action
-      throw new Error('Failed to send email verification request');
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        'Failed to resend verification email';
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
@@ -177,8 +183,8 @@ export const authSlice = createSlice({
       .addCase(verifyEmail.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.user.verified = true;
-      })
+        state.user = { ...state.user, verified: true };
+      })      
       .addCase(verifyEmail.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
