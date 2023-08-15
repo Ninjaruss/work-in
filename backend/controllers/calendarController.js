@@ -100,14 +100,55 @@ const updateCalendarByUserId = asyncHandler(async (req, res) => {
   res.send(updatedCalendar);
 });
 
+// Get a calendar by organization ID
+const getCalendarByOrganizationId = asyncHandler(async (req, res) => {
+  const organizationId = req.params.organizationId;
+  const calendar = await Calendar.findOne({ organizationId: organizationId }).populate('events');
+  
+  if (!calendar) {
+    return res.status(404).json({ message: 'Calendar not found for the organization' });
+  }
+  
+  res.status(200).json(calendar);
+});
+
 // Update a calendar by organization ID
 const updateCalendarByOrganizationId = asyncHandler(async (req, res) => {
-    const organizationId = req.params.organizationId;
-    const calendar = await Calendar.findOneAndUpdate({ organizationId: organizationId }, req.body, { new: true });
-    if (!calendar) {
-      return res.status(404).send({ error: 'Calendar not found' });
+  const organizationId = req.params.organizationId;
+  const calendarData = req.body; // Updated calendar data from request body
+  const updatedEvents = calendarData.events; // Extract events array from calendarData
+  const calendar = await Calendar.findOne({ organizationId: organizationId });
+
+  if (!calendar) {
+    return res.status(404).send({ error: 'Calendar not found' });
+  }
+
+  const events = calendar.events;
+
+  // Loop through events array and remove events that are not present in updatedEvents array
+  const eventsToRemove = events.filter(event => !updatedEvents.some(updatedEvent => updatedEvent.id === event.id));
+  eventsToRemove.forEach(eventToRemove => {
+    const eventIndex = events.findIndex(event => event.id === eventToRemove.id);
+    if (eventIndex !== -1) {
+      events.splice(eventIndex, 1); // Remove event from events array
     }
-    res.send(calendar);
+  });
+
+  // Loop through updatedEvents array and update events in events array
+  for (const updatedEvent of updatedEvents) {
+    const existingEventIndex = events.findIndex(event => event.id === updatedEvent.id); // Find index of existing event
+
+    if (existingEventIndex !== -1) {
+      // If eventId exists in events array, update the existing event
+      events[existingEventIndex] = updatedEvent; // Update the event at existingEventIndex with updatedEvent
+    } else {
+      // If eventId does not exist, append the updatedEvent to events array
+      events.push(updatedEvent);
+    }
+  }
+
+  const updatedCalendar = await calendar.save();
+  res.send(updatedCalendar);
 });
 
 // Delete a calendar by user ID
@@ -128,7 +169,9 @@ module.exports = {
 
   getCalendarByUserId,
   updateCalendarByUserId,
-  updateCalendarByOrganizationId,
-  deleteCalendarByUserId,
 
+  getCalendarByOrganizationId,
+  updateCalendarByOrganizationId,
+
+  deleteCalendarByUserId,
 };

@@ -25,6 +25,9 @@ router.put('/user/:userId', calendarController.updateCalendarByUserId);
 // Update a calendar by organization ID
 router.put('/organization/:organizationId', calendarController.updateCalendarByOrganizationId);
 
+// Get a calendar by organization ID
+router.get('/organization/:organizationId', calendarController.getCalendarByOrganizationId);
+
 // Delete a calendar by user ID
 router.delete('/user/:userId', calendarController.deleteCalendarByUserId);
 
