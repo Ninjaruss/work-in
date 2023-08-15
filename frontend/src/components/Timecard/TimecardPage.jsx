@@ -30,7 +30,7 @@ const initEvents = [
         end
     },
     {
-        calendarId: "company",
+        calendarId: "organization",
         category: "time",
         isVisible: true,
         title: "Meeting",

@@ -70,7 +70,7 @@ const CreateEventModal = ({ show, handleClose, handleCreateEvent }) => {
               onChange={(e) => setCalendarId(e.target.value)}
             >
               <option value="personal">Personal</option>
-              <option value="company">Company</option>
+              <option value="organization">Organization</option>
               <option value="available">Available</option>
             </Form.Control>
           </Form.Group>

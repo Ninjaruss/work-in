@@ -18,13 +18,16 @@ import {
     deleteCalendar,
     getCalendarByUserId,
     updateCalendarByUserId,
+
+    getCalendarByOrganizationId ,
     updateCalendarByOrganizationId,
+
     deleteCalendarByUserId,
   } from '../../features/calendarService';
 
 const start = new Date();
 const end = new Date(new Date().setMinutes(start.getMinutes() + 30));
-const initCalendars = [{ id: '1', name: 'Personal'},{ id: '2', name: 'Company' }, { id: '3', name: 'Available' }];
+const initCalendars = [{ id: '1', name: 'Personal'},{ id: '2', name: 'Organization' }, { id: '3', name: 'Available' }];
 const initEvents = [
     {
         calendarId: "personal",
@@ -37,7 +40,7 @@ const initEvents = [
         end
     },
     {
-        calendarId: "company",
+        calendarId: "organization",
         category: "time",
         isVisible: true,
         title: "Meeting",
@@ -55,6 +58,7 @@ const calendarData = {
 
 const DayViewModal = (props) => {
     const user = useSelector(state => state.auth.user);
+    const organizationId = user?.organization; // Assuming user's organization ID is stored in user object
 
     const cal = useRef(null);
     const [calendars, setCalendars] = useState(initCalendars);
@@ -63,7 +67,7 @@ const DayViewModal = (props) => {
     
     // Toggle filters
     const [personalEnabled, setPersonalEnabled] = useState(true);
-    const [companyEnabled, setCompanyEnabled] = useState(false);
+    const [organizationEnabled, setCompanyEnabled] = useState(false);
     const [availableEnabled, setAvailableEnabled] = useState(false);
 
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -77,7 +81,7 @@ const DayViewModal = (props) => {
     const [body, setBody] = useState("");
 
     useEffect(() => {
-        if (user) {
+        if (user && organizationId) {
             // init new test calendar
             calendarData.userId = user._id;
             createCalendar(calendarData)
@@ -88,6 +92,8 @@ const DayViewModal = (props) => {
               console.error(error);
             });
             
+            
+            /*
             // Fetch calendars from calendarService
             getCalendarByUserId(user._id)
                 .then(calendar => {
@@ -95,8 +101,36 @@ const DayViewModal = (props) => {
                     setEvents(calendar.events);
                 })
                 .catch(error => console.error('Error fetching calendars:', error));
+            */
+
+        // Fetch events from the user's personal calendar
+        getCalendarByUserId(user._id)
+        .then(userCalendar => {
+            setEventsInitialized(false);
+
+            // Fetch events from the organization's calendar
+            getCalendarByOrganizationId(organizationId)
+                .then(orgCalendar => {
+                    // Filter events for personal and organization categories
+                    const userEvents = userCalendar.events.map(event => ({
+                        ...event,
+                        calendarId: user._id, // Categorize user's events
+                    }));
+
+                    const orgEvents = orgCalendar.events.map(event => ({
+                        ...event,
+                        calendarId: organizationId, // Categorize organization's events
+                    }));
+
+                    // Combine and set events
+                    const combinedEvents = [...userEvents, ...orgEvents];
+                    setEvents(combinedEvents);
+                })
+                .catch(error => console.error('Error fetching organization calendar:', error));
+        })
+        .catch(error => console.error('Error fetching user calendar:', error));
         }
-    }, [user, user.id]);
+    }, [user, organizationId]);
     
     const onClickEvent = useCallback((e) => {
         const { calendarId, id, title, isAllDay, body } = e.event;
@@ -150,7 +184,7 @@ const DayViewModal = (props) => {
         console.log("createEvent:" + eventData);
 
         const event = {
-          calendarId: eventData.calendarId ?? "personal",
+          calendarId: eventData.calendarId,
           id: String(uuidv4()),
           title: eventData.title,
           isAllDay: eventData.isAllDay,
@@ -331,9 +365,9 @@ const DayViewModal = (props) => {
         cal.current.getInstance().setDate(props.date.toLocaleDateString());
     }
 
-    // Filter form toggles
+    // In handleToggle function
     const handleToggle = (toggleName, toggleValue) => {
-        const enabledCount = [personalEnabled, companyEnabled, availableEnabled].filter(Boolean).length;
+        const enabledCount = [personalEnabled, organizationEnabled, availableEnabled].filter(Boolean).length;
 
         if (toggleValue === true || enabledCount > 1) {
             switch (toggleName) {
@@ -341,9 +375,16 @@ const DayViewModal = (props) => {
                     cal.current.getInstance().setCalendarVisibility('personal', toggleValue);
                     setPersonalEnabled(toggleValue);
                     break;
-                case 'company':
-                    cal.current.getInstance().setCalendarVisibility('company', toggleValue);
+                case 'organization':
+                    cal.current.getInstance().setCalendarVisibility('organization', toggleValue);
                     setCompanyEnabled(toggleValue);
+
+                    // Also update visibility for user's events
+                    if (!toggleValue) {
+                        cal.current.getInstance().setCalendarVisibility(user._id, true);
+                    } else {
+                        cal.current.getInstance().setCalendarVisibility(user._id, false);
+                    }
                     break;
                 case 'available':
                     cal.current.getInstance().setCalendarVisibility('available', toggleValue);
@@ -355,38 +396,38 @@ const DayViewModal = (props) => {
         }
     };
 
-    useEffect(() => {
-        const updatedCalendars = [];
-      
-        if (personalEnabled) {
-          updatedCalendars.push({
-            id: 'personal',
+useEffect(() => {
+    const updatedCalendars = [];
+  
+    if (personalEnabled) {
+        updatedCalendars.push({
+            id: user._id,
             name: 'Personal',
             bgColor: '#9e5fff',
             borderColor: '#9e5fff'
-          });
-        }
-      
-        if (companyEnabled) {
-          updatedCalendars.push({
-            id: 'company',
-            name: 'Company',
+        });
+    }
+  
+    if (organizationEnabled) {
+        updatedCalendars.push({
+            id: organizationId,
+            name: 'Organization',
             bgColor: '#ffc939',
             borderColor: '#ffc939'
-          });
-        }
-      
-        if (availableEnabled) {
-          updatedCalendars.push({
+        });
+    }
+  
+    if (availableEnabled) {
+        updatedCalendars.push({
             id: 'available',
             name: 'Available',
             bgColor: '#1cb3c8',
             borderColor: '#1cb3c8'
-          });
-        }
-      
-        setCalendars(updatedCalendars);
-    }, [personalEnabled, companyEnabled, availableEnabled]);
+        });
+    }
+  
+    setCalendars(updatedCalendars);
+}, [personalEnabled, organizationEnabled, availableEnabled, user._id, organizationId]);
     
     /*
     React Variables exported to Calendar
@@ -415,10 +456,10 @@ const DayViewModal = (props) => {
                                 />
                                 <Form.Check
                                     type="switch"
-                                    id="company-switch"
-                                    label="Company"
-                                    checked={companyEnabled}
-                                    onChange={(e) => handleToggle('company', e.target.checked)}
+                                    id="organization-switch"
+                                    label="Organization"
+                                    checked={organizationEnabled}
+                                    onChange={(e) => handleToggle('organization', e.target.checked)}
                                 />
                                 <Form.Check
                                     type="switch"
@@ -426,7 +467,7 @@ const DayViewModal = (props) => {
                                     label="Available"
                                     checked={availableEnabled}
                                     onChange={(e) => handleToggle('available', e.target.checked)}
-                                    disabled={!personalEnabled && !companyEnabled && !availableEnabled}
+                                    disabled={!personalEnabled && !organizationEnabled && !availableEnabled}
                                 />
                             </Form>
 
@@ -475,7 +516,7 @@ const DayViewModal = (props) => {
                                     required
                                 >
                                     <option value="personal">Personal</option>
-                                    <option value="company">Company</option>
+                                    <option value="organization">Organization</option>
                                     <option value="available">Available</option>
                                 </Form.Control>
                                 </Form.Group>

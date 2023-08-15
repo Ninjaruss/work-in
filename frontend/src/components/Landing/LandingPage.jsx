@@ -46,7 +46,7 @@ const LandingPage = () => {
                   <Form.Control type="name" placeholder="White"/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formCompany">
-                  <Form.Label>Company Name</Form.Label>
+                  <Form.Label>Organization Name</Form.Label>
                   <Form.Control type="name" placeholder="Work-in"/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formEmail">
