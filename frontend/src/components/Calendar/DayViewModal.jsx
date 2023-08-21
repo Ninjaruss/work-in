@@ -78,11 +78,13 @@ const DayViewModal = (props) => {
     
     // Toggle filters
     const [personalEnabled, setPersonalEnabled] = useState(true);
-    const [organizationEnabled, setCompanyEnabled] = useState(false);
+    const [organizationEnabled, setOrganizationEnabled] = useState(false);
     const [availableEnabled, setAvailableEnabled] = useState(false);
 
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null); // date selected from the regular React calendar (props.date)
+
+    const [eventId, setEventId] = useState("");
 
     // Add new time from selected/highlighted slot button
     const [showPrompt, setShowPrompt] = useState(false);
@@ -127,12 +129,18 @@ const DayViewModal = (props) => {
                 .then(orgCalendars => {
                     // Create an array to store all organization events
                     const orgEvents = [];
-
+                    
                     // Iterate through each organization calendar and fetch its events
                     orgCalendars.forEach(orgCalendar => {
+                        // Check if the calendar belongs to the logged-in user's organization
+                        if (orgCalendar.userId === user._id) {
+                        // Skip this calendar as it belongs to the same user
+                        return;
+                        }
+                        
                         orgEvents.push(...orgCalendar.events.map(event => ({
-                            ...event,
-                            calendarId: 'organization', 
+                        ...event,
+                        calendarId: 'organization',
                         })));
                     });
 
@@ -152,7 +160,7 @@ const DayViewModal = (props) => {
         })
             .catch(error => console.error('Error fetching user calendar:', error));
         }
-    }, [user, organizationId]);
+    }, [user, cal, organizationId]);
 
     
     const onClickEvent = useCallback((e) => {
@@ -168,6 +176,10 @@ const DayViewModal = (props) => {
             setTitle(title);
         }
 
+        if (id) {
+            setEventId(id);
+        }
+
         if (calendarId) {
             setCalendarId(calendarId);
         }
@@ -180,31 +192,44 @@ const DayViewModal = (props) => {
             setBody(body);
         }
 
-      }, [cal, setTitle, setCalendarId, setIsAllDay, setBody]);
+      }, [cal, setTitle, setEventId, setCalendarId, setIsAllDay, setBody]);
     
     const onSelectDateTime = useCallback((eventData) => {
         setSelectedEvent(eventData);
     });
 
-    // Save calendar whenever the events state changes; ignores first 2 sets (init of events and fetching of events from database)
-    useEffect(() => {  
-        if (eventsInitialized) {
-            // Perform any actions that depend on the updated events state here
-            console.log("calendar events saving")
-            console.log("userId: ", user._id)
-            console.table(events);
-
-            const updatedCalendarData = {userId: user._id, events: events};
-
-            updateCalendarByUserId(user._id, updatedCalendarData)
-                .catch(error => console.error('Error saving calendar:', error));
-
-        } else {
-            // If events state is not initialized, set the flag to true
-            console.log("events initialized")
-            setEventsInitialized(true);
+    // Save calendar whenever the events state changes
+    useEffect(() => {
+    if (eventsInitialized) {
+      // Filter events belonging to the logged-in user's organization
+      const eventsToSave = events.filter(event => {
+        if (event.calendarId === 'personal') {
+          // Always save personal events
+          return true;
+        } else if (event.calendarId === 'organization') {
+          // Save organization events only if they belong to the logged-in user's organization
+          return event.userId === user._id;
         }
-    }, [eventsInitialized, user._id, events]); 
+        // Skip 'available' events for now (modify this logic if needed)
+        return false;
+      });
+  
+      // Perform any actions that depend on the updated events state here
+      console.log("calendar events saving");
+      console.log("userId: ", user._id);
+      console.table(eventsToSave);
+  
+      const updatedCalendarData = { userId: user._id, events: eventsToSave };
+  
+      updateCalendarByUserId(user._id, updatedCalendarData)
+        .catch(error => console.error('Error saving calendar:', error));
+    } else {
+      // If events state is not initialized, set the flag to true
+      console.log("events initialized");
+      setEventsInitialized(true);
+    }
+  }, [eventsInitialized, user._id, events]);
+  
 
     const onBeforeCreateEvent = useCallback((eventData) => {
         console.log("createEvent:" + eventData);
@@ -351,7 +376,7 @@ const DayViewModal = (props) => {
         setCalendarId("personal");
         setIsAllDay(false);
         setBody("");
-        
+        setEventId("");
       };
 
     const handleDeleteEvent = () => {
@@ -378,6 +403,15 @@ const DayViewModal = (props) => {
             cal.current.getInstance().setDate(props.date.toLocaleDateString());
             cal.current.getInstance().scrollToNow();
             setSelectedDate(props.date.toLocaleDateString());
+
+            console.log("setCalendarVisibility")
+            cal.current.getInstance().setCalendarVisibility('personal', true);
+            cal.current.getInstance().setCalendarVisibility('organization', true);
+            cal.current.getInstance().setCalendarVisibility('available', false);
+            setPersonalEnabled(true);
+            setOrganizationEnabled(true);
+            setAvailableEnabled(false);
+
         }
     }, [cal, props.date]);
 
@@ -403,11 +437,11 @@ const DayViewModal = (props) => {
                     break;
                 case 'organization':
                     cal.current.getInstance().setCalendarVisibility('organization', toggleValue);
-                    setCompanyEnabled(toggleValue);
+                    setOrganizationEnabled(toggleValue);
                     break;
                 case 'available':
                     cal.current.getInstance().setCalendarVisibility('available', toggleValue);
-                    setCompanyEnabled(toggleValue);
+                    setAvailableEnabled(toggleValue);
                     break
             }
         }
@@ -514,48 +548,56 @@ const DayViewModal = (props) => {
                         <Col sm={3} className="bg-light">
                             <Form>
                                 <Form.Group>
-                                <Form.Label><h4>Title</h4></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter title"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    required
-                                />
+                                    <Form.Label><h4>Title</h4></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter title"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        required
+                                    />
                                 </Form.Group>
                                 <Form.Group>
-                                <Form.Label><h4>Calendar</h4></Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    value={calendarId}
-                                    onChange={(e) => setCalendarId(e.target.value)}
-                                    name="calendarId"
-                                    required
-                                >
-                                    <option value="personal">Personal</option>
-                                    <option value="organization">Organization</option>
-                                    <option value="available">Available</option>
-                                </Form.Control>
+                                    <Form.Label><h4>Calendar</h4></Form.Label>
+                                    <Form.Control
+                                        as="select"
+                                        value={calendarId}
+                                        onChange={(e) => setCalendarId(e.target.value)}
+                                        name="calendarId"
+                                        required
+                                    >
+                                        <option value="personal">Personal</option>
+                                        <option value="organization">Organization</option>
+                                        <option value="available">Available</option>
+                                    </Form.Control>
                                 </Form.Group>
                                 <Form.Group>
-                            
-                                <Form.Check
-                                    type="checkbox"
-                                    label="All Day"
-                                    checked={isAllDay}
-                                    onChange={(e) => setIsAllDay(e.target.checked)}
-                                    name="isAllDay"
-                                />
+                                    <Form.Check
+                                        type="checkbox"
+                                        label="All Day"
+                                        checked={isAllDay}
+                                        onChange={(e) => setIsAllDay(e.target.checked)}
+                                        name="isAllDay"
+                                    />
                                 </Form.Group>
                                 <Form.Group>
-                                <Form.Label><h4>Body</h4></Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    placeholder="Enter body"
-                                    value={body}
-                                    onChange={(e) => setBody(e.target.value)}
-                                    required
-                                />
+                                    <Form.Label><h4>Body</h4></Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        placeholder="Enter body"
+                                        value={body}
+                                        onChange={(e) => setBody(e.target.value)}
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group>
+                                    <Form.Label><h4>Event ID</h4></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Event ID"
+                                        value={eventId}
+                                        disabled // Disable editing for this field
+                                    />
                                 </Form.Group>
                             </Form>
                             <Row className="mt-3">
