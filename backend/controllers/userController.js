@@ -435,7 +435,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
     user.verified = true;
     await user.save();
 
-    res.status(200).json({ message: 'Email verified successfully' });
+    res.status(200).json({ message: 'Email verified successfully' }, user);
   } catch (error) {
     // Handle any other errors that may occur during verification
     res.status(500).json({ error: 'Failed to verify email' });

@@ -72,7 +72,7 @@ export const verifyEmail = createAsyncThunk(
     try {
       await authService.verifyEmail(token);
       // Clear user data from local storage after successful verification
-      localStorage.removeItem('user');
+      localStorage.setItem('user');
       return true;
     } catch (error) {
       // Handle error, e.g. show error message or dispatch failure action
