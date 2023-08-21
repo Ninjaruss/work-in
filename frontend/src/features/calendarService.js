@@ -91,7 +91,7 @@ export const updateCalendarByUserId = async (userId, calendarData) => {
 };
 
 // Fetch calendar by organization ID
-export const getCalendarByOrganizationId = async (organizationId) => {
+export const getCalendarsByOrganizationId = async (organizationId) => {
   try {
     const response = await axios.get(constructApiUrl(`organization/${organizationId}`));
     return response.data;

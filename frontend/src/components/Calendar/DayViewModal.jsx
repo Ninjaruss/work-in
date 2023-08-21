@@ -19,7 +19,7 @@ import {
     getCalendarByUserId,
     updateCalendarByUserId,
 
-    getCalendarByOrganizationId ,
+    getCalendarsByOrganizationId ,
     updateCalendarByOrganizationId,
 
     deleteCalendarByUserId,
@@ -27,7 +27,16 @@ import {
 
 const start = new Date();
 const end = new Date(new Date().setMinutes(start.getMinutes() + 30));
+
+const initCalendars = ([
+    { id: 'personal', name: 'Personal', bgColor: '#9e5fff', borderColor: '#9e5fff' },
+    { id: 'organization', name: 'Organization', bgColor: '#ffc939', borderColor: '#ffc939' },
+    { id: 'available', name: 'Available', bgColor: '#1cb3c8', borderColor: '#1cb3c8' },
+  ]);
+
+/*
 const initCalendars = [{ id: '1', name: 'Personal'},{ id: '2', name: 'Organization' }, { id: '3', name: 'Available' }];
+
 const initEvents = [
     {
         calendarId: "personal",
@@ -56,6 +65,8 @@ const calendarData = {
     events: initEvents
 };
 
+*/
+
 const DayViewModal = (props) => {
     const user = useSelector(state => state.auth.user);
     const organizationId = user?.organization; // Assuming user's organization ID is stored in user object
@@ -82,6 +93,7 @@ const DayViewModal = (props) => {
 
     useEffect(() => {
         if (user && organizationId) {
+            /*
             // init new test calendar
             calendarData.userId = user._id;
             createCalendar(calendarData)
@@ -91,6 +103,7 @@ const DayViewModal = (props) => {
             .catch(error => {
               console.error(error);
             });
+            */
             
             
             /*
@@ -104,33 +117,43 @@ const DayViewModal = (props) => {
             */
 
         // Fetch events from the user's personal calendar
+        console.log("getCalendarByUserId")
         getCalendarByUserId(user._id)
         .then(userCalendar => {
             setEventsInitialized(false);
 
             // Fetch events from the organization's calendar
-            getCalendarByOrganizationId(organizationId)
-                .then(orgCalendar => {
+            getCalendarsByOrganizationId(organizationId) // Updated to fetch all organization calendars
+                .then(orgCalendars => {
+                    // Create an array to store all organization events
+                    const orgEvents = [];
+
+                    // Iterate through each organization calendar and fetch its events
+                    orgCalendars.forEach(orgCalendar => {
+                        orgEvents.push(...orgCalendar.events.map(event => ({
+                            ...event,
+                            calendarId: 'organization', 
+                        })));
+                    });
+
                     // Filter events for personal and organization categories
                     const userEvents = userCalendar.events.map(event => ({
                         ...event,
-                        calendarId: user._id, // Categorize user's events
-                    }));
-
-                    const orgEvents = orgCalendar.events.map(event => ({
-                        ...event,
-                        calendarId: organizationId, // Categorize organization's events
+                        calendarId: 'personal', // Categorize user's events
                     }));
 
                     // Combine and set events
                     const combinedEvents = [...userEvents, ...orgEvents];
+                    console.log("--combinedEvents--")
+                    console.table(combinedEvents)
                     setEvents(combinedEvents);
                 })
-                .catch(error => console.error('Error fetching organization calendar:', error));
+            .catch(error => console.error('Error fetching organization calendar:', error));
         })
-        .catch(error => console.error('Error fetching user calendar:', error));
+            .catch(error => console.error('Error fetching user calendar:', error));
         }
     }, [user, organizationId]);
+
     
     const onClickEvent = useCallback((e) => {
         const { calendarId, id, title, isAllDay, body } = e.event;
@@ -167,6 +190,8 @@ const DayViewModal = (props) => {
     useEffect(() => {  
         if (eventsInitialized) {
             // Perform any actions that depend on the updated events state here
+            console.log("calendar events saving")
+            console.log("userId: ", user._id)
             console.table(events);
 
             const updatedCalendarData = {userId: user._id, events: events};
@@ -176,6 +201,7 @@ const DayViewModal = (props) => {
 
         } else {
             // If events state is not initialized, set the flag to true
+            console.log("events initialized")
             setEventsInitialized(true);
         }
     }, [eventsInitialized, user._id, events]); 
@@ -365,10 +391,10 @@ const DayViewModal = (props) => {
         cal.current.getInstance().setDate(props.date.toLocaleDateString());
     }
 
-    // In handleToggle function
+    // Filter form toggles
     const handleToggle = (toggleName, toggleValue) => {
         const enabledCount = [personalEnabled, organizationEnabled, availableEnabled].filter(Boolean).length;
-
+    
         if (toggleValue === true || enabledCount > 1) {
             switch (toggleName) {
                 case 'personal':
@@ -378,56 +404,47 @@ const DayViewModal = (props) => {
                 case 'organization':
                     cal.current.getInstance().setCalendarVisibility('organization', toggleValue);
                     setCompanyEnabled(toggleValue);
-
-                    // Also update visibility for user's events
-                    if (!toggleValue) {
-                        cal.current.getInstance().setCalendarVisibility(user._id, true);
-                    } else {
-                        cal.current.getInstance().setCalendarVisibility(user._id, false);
-                    }
                     break;
                 case 'available':
                     cal.current.getInstance().setCalendarVisibility('available', toggleValue);
-                    setAvailableEnabled(toggleValue);
-                    break;
-                default:
-                    break;
+                    setCompanyEnabled(toggleValue);
+                    break
             }
         }
     };
-
-useEffect(() => {
-    const updatedCalendars = [];
-  
-    if (personalEnabled) {
-        updatedCalendars.push({
-            id: user._id,
-            name: 'Personal',
-            bgColor: '#9e5fff',
-            borderColor: '#9e5fff'
-        });
-    }
-  
-    if (organizationEnabled) {
-        updatedCalendars.push({
-            id: organizationId,
-            name: 'Organization',
-            bgColor: '#ffc939',
-            borderColor: '#ffc939'
-        });
-    }
-  
-    if (availableEnabled) {
-        updatedCalendars.push({
-            id: 'available',
-            name: 'Available',
-            bgColor: '#1cb3c8',
-            borderColor: '#1cb3c8'
-        });
-    }
-  
-    setCalendars(updatedCalendars);
-}, [personalEnabled, organizationEnabled, availableEnabled, user._id, organizationId]);
+    
+    useEffect(() => {
+        const updatedCalendars = [];
+    
+        if (personalEnabled) {
+            updatedCalendars.push({
+                id: 'personal',
+                name: 'Personal',
+                bgColor: '#9e5fff',
+                borderColor: '#9e5fff'
+            });
+        }
+    
+        if (organizationEnabled) {
+            updatedCalendars.push({
+                id: 'organization',
+                name: 'Organization',
+                bgColor: '#ffc939',
+                borderColor: '#ffc939'
+            });
+        }
+    
+        if (availableEnabled) {
+            updatedCalendars.push({
+                id: 'available',
+                name: 'Available',
+                bgColor: '#1cb3c8',
+                borderColor: '#1cb3c8'
+            });
+        }
+    
+        setCalendars(updatedCalendars);
+    }, [personalEnabled, organizationEnabled, availableEnabled, user._id]);
     
     /*
     React Variables exported to Calendar

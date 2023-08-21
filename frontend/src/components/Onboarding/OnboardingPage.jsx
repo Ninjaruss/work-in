@@ -383,10 +383,15 @@ const OnboardingPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to track whether the form is currently submitting
+  const [submissionError, setSubmissionError] = useState(null); // State to store any submission error message
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isStepValid()) {
+      setIsSubmitting(true); // Set submitting state to true
+
       // Dispatch the registerAll action or perform any necessary API calls here
       const orgName = organizationName;
       const orgType = organizationType;
@@ -418,27 +423,27 @@ const OnboardingPage = () => {
         data
       });
 
-      dispatch(registerAll(data))
-      .then((response) => {
-        console.log('Response from API:', response);
+      try {
+        const response = await dispatch(registerAll(data));
 
         if (response.error) {
           // Handle the error returned by the backend
           console.log('Backend error:', response.error);
-          // Display an error message or handle the error in an appropriate way
-          alert('An error occurred while submitting the form. Please try again later.');
+          setSubmissionError('An error occurred while submitting the form. Please try again later.');
         } else {
           // Submission was successful
           // Redirect to a success page or display a success message
           // navigate('/home');
+          alert('Form submitted successfully!');
+          navigate('/home'); // Route to the home page after successful submission
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         // Handle dispatch or network error
         console.log('Error:', error);
-        // Display an error message or handle the error in an appropriate way
-        alert('An error occurred while submitting the form. Please try again later.');
-      });
+        setSubmissionError('An error occurred while submitting the form. Please try again later.');
+      } finally {
+        setIsSubmitting(false); // Reset submitting state
+      }
     } else {
       alert('Please fill out all required fields before submitting.');
     }
@@ -586,13 +591,18 @@ const OnboardingPage = () => {
               <Button
                 variant="success"
                 onClick={handleSubmit}
-                disabled={!isStepValid()}
+                disabled={!isStepValid() || isSubmitting} // Disable the button when submitting
                 style={{ marginLeft: "1rem" }}
               >
-                Submit
+                {isSubmitting ? 'Submitting...' : 'Submit'} {/* Change button text when submitting */}
               </Button>
             )}
           </div>
+          {submissionError && (
+            <Alert variant="danger" style={{ marginTop: '1rem' }}>
+              {submissionError}
+            </Alert>
+          )}
         </Card.Body>
       </Card>
     </Container>

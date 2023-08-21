@@ -36,7 +36,7 @@ function VerifyEmailPage() {
         .unwrap()
         .then(() => {
           toast.success('Email verified successfully.');
-          navigate('/login');
+          navigate('/home');
         })
         .catch(error => {
           toast.error(error.message || 'Failed to verify email.');

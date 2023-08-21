@@ -100,16 +100,18 @@ const updateCalendarByUserId = asyncHandler(async (req, res) => {
   res.send(updatedCalendar);
 });
 
-// Get a calendar by organization ID
-const getCalendarByOrganizationId = asyncHandler(async (req, res) => {
+// Get calendars by organization ID
+const getCalendarsByOrganizationId = asyncHandler(async (req, res) => {
   const organizationId = req.params.organizationId;
-  const calendar = await Calendar.findOne({ organizationId: organizationId }).populate('events');
+  const calendars = await Calendar.find({ organizationId: organizationId }).populate('events');
+
+  console.log("getCalendarsByOrganizationId: ", organizationId)
   
-  if (!calendar) {
-    return res.status(404).json({ message: 'Calendar not found for the organization' });
+  if (!calendars || calendars.length === 0) {
+    return res.status(404).json({ message: 'Calendars not found for the organization' });
   }
   
-  res.status(200).json(calendar);
+  res.status(200).json(calendars);
 });
 
 // Update a calendar by organization ID
@@ -170,7 +172,7 @@ module.exports = {
   getCalendarByUserId,
   updateCalendarByUserId,
 
-  getCalendarByOrganizationId,
+  getCalendarsByOrganizationId,
   updateCalendarByOrganizationId,
 
   deleteCalendarByUserId,
