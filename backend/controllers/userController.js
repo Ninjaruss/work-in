@@ -295,7 +295,10 @@ const registerAll = async (req, res) => {
       );
     }
 
-    res.status(200).json({ message: 'Users registered and calendars saved successfully!' });
+    // Return the updated user
+    const updatedUser = await User.findById(user._id);
+
+    res.status(200).json({ message: 'Users registered and calendars saved successfully!' , user: updatedUser});
   } catch (error) {
     console.error('Error registering users and saving calendars:', error);
     res.status(500).json({ error: 'An error occurred while registering users and saving calendars' });
@@ -332,13 +335,13 @@ const sendEmailVerification = asyncHandler(async (email, verificationToken, gene
       // text: emailBody, // Email body
       html: `
       <p>
-      Here are your temporary login details:
+      Here are your login details:
       <br> User Log-in: ${email}
-      <br> Password: ${generatedPassword}<br>
+      <br> ${generatedPassword ? `Temporary Password: ${generatedPassword}` : 'Please use your own password'}
       <br> Step 1). Click the following link to access the <a href="https://work-in.net">Work-In Website</a>
-      <br> Step 2). Log-in with the user log-in and password provided in this email
+      <br> Step 2). Log in with the user login and password provided in this email
       <br> Step 3). Click the following link to verify your email while you are logged in <a href="${process.env.APP_URL}/verify-email?token=${verificationToken}">Verify Email</a>
-      <br> Step 4). Welcome to Work-in! You can now access your work schedule through the internet 
+      <br> Step 4). Welcome to Work-In! You can now access your work schedule through the internet 
       </p>`, // Email body with HTML
     };
 
