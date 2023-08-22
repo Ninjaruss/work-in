@@ -69,6 +69,7 @@ export const verifyEmail = createAsyncThunk(
   async (token, thunkAPI) => {
     try {
       await authService.verifyEmail(token);
+      localStorage.removeItem('user');
       return true;
     } catch (error) {
       // Handle error, e.g. show error message or dispatch failure action

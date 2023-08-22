@@ -87,7 +87,6 @@ const DayViewModal = (props) => {
     const [eventId, setEventId] = useState("");
 
     // Add new time from selected/highlighted slot button
-    const [showPrompt, setShowPrompt] = useState(false);
     const [title, setTitle] = useState("");
     const [calendarId, setCalendarId] = useState("personal");
     const [isAllDay, setIsAllDay] = useState(false);
