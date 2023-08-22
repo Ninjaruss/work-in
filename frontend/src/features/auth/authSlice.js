@@ -70,10 +70,10 @@ export const verifyEmail = createAsyncThunk(
   'auth/verifyEmail',
   async (token, thunkAPI) => {
     try {
-      await authService.verifyEmail(token);
+      const response = await authService.verifyEmail(token);
       // Update localstorage's user data
-      localStorage.setItem('user');
-      return { success: true, user };
+      localStorage.setItem('user', JSON.stringify(response.data));
+      return { success: true, user: response.data };
     } catch (error) {
       // Handle error, e.g. show error message or dispatch failure action
       const message =

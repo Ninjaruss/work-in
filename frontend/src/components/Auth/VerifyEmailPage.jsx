@@ -34,9 +34,17 @@ function VerifyEmailPage() {
     if (token) {
       dispatch(verifyEmail(token))
         .unwrap()
-        .then(() => {
-          toast.success('Email verified successfully.');
-          navigate('/home');
+        .then(response => {
+          if (response.success) {
+            // Email verification was successful
+            toast.success('Email verified successfully.');
+            // You can now access the user data from response.user if needed
+            navigate('/home');
+          } else {
+            // Email verification failed
+            toast.error(response.error || 'Failed to verify email.');
+            navigate('/verify-email'); // Redirect back to verification page
+          }
         })
         .catch(error => {
           toast.error(error.message || 'Failed to verify email.');
