@@ -298,7 +298,7 @@ const registerAll = async (req, res) => {
     // Return the updated user
     const updatedUser = await User.findById(user._id);
 
-    res.status(200).json({ message: 'Users registered and calendars saved successfully!' , user: updatedUser});
+    res.status(200).json({ message: 'Users registered and calendars saved successfully!' });
   } catch (error) {
     console.error('Error registering users and saving calendars:', error);
     res.status(500).json({ error: 'An error occurred while registering users and saving calendars' });

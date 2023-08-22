@@ -47,8 +47,6 @@ export const register = createAsyncThunk(
 export const registerAll = createAsyncThunk(
   'auth/registerAll',
   async (data, thunkAPI) => {
-    const { user, orgName, employees, employeeSchedules } = data; // Extract email from user object
-
     try {
       return await authService.registerAll(data);
     } catch (error) {
