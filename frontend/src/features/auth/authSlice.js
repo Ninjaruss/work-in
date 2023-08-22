@@ -71,16 +71,16 @@ export const verifyEmail = createAsyncThunk(
   async (token, thunkAPI) => {
     try {
       await authService.verifyEmail(token);
-      // Clear user data from local storage after successful verification
+      // Update localstorage's user data
       localStorage.setItem('user');
-      return true;
+      return { success: true, user };
     } catch (error) {
       // Handle error, e.g. show error message or dispatch failure action
       const message =
         (error.response && error.response.data && error.response.data.message) ||
         error.message ||
         'Failed to verify email';
-      return thunkAPI.rejectWithValue(message);
+        return thunkAPI.rejectWithValue({ success: false, error: message });
     }
   }
 );

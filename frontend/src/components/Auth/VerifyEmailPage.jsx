@@ -120,15 +120,8 @@ function VerifyEmailPage() {
         </Card.Header>
         <Card.Body>
           <p>
-            Please check your email for a verification link. If you did not receive the email, you can click the button below to resend the verification email.
+            Please check your email for a verification link. Resending of email with verfication link functionailty will be added soon..
           </p>
-          <Form.Group>
-            <div className="d-grid">
-              <Button variant="info" size="lg" onClick={onResendEmail} disabled={isLoading}>
-                {isLoading ? "Resending..." : "Resend Email"}
-              </Button>
-            </div>
-          </Form.Group>
         </Card.Body>
       </Card>
     </Container>
