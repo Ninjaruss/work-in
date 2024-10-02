@@ -16,3 +16,4 @@ A web application that allows companies to create work schedules with their empl
 - Implementation of proper JWT token authentication for logins
 - Designing the data structure for the calendars and employee data and including core functions to obtain and update data
 - Received additional practice in designing a website's frontend
+- Troubleshooting and creating a full stack application on my own
