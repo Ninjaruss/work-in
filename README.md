@@ -2,8 +2,8 @@
 A hobby project my friend and I developed between Summer 2022 - Summer 2023 intending to support small businesses with organizing work schedules for employees.
 
 ## Members
-Paul Marquez - Project Manager 
-Russell Azucenas - Full Stack Developer 
+Paul Marquez - Project Manager  
+Russell Azucenas - Full Stack Developer  
 
 
 ## Project Description
